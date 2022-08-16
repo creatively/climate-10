@@ -14,23 +14,21 @@ app.use(cors({
     ]
 }))
 
-app.get('/', (req: Request, res: Response) => {
-    const city: any = req.query.city
-    const startDate: string  = `2022-08-10`
-    const endDate: string = `2022-08-24`
-    const apiUrl: string = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${city}/${startDate}/${endDate}?unitGroup=uk&key=ZG6RTP56DLKZJ8LWJCLVK4RM7&contentType=json`;
+app.get('/history', (req: Request, res: Response) => {
+console.log(req.url)
 
-    function returnData(data: any): void {
-        console.log(data)
-        res.send(data)
-    }
+    const address: any = req.query.address
+    const startDate: any = req.query.startDate
+    const endDate: any = req.query.endDate
+    const apiUrl: string = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${address}/${startDate}/${endDate}?unitGroup=uk&key=ZG6RTP56DLKZJ8LWJCLVK4RM7&contentType=json`;
 
     (async () => {
+        console.log(`about to axios`)
         await axios(apiUrl)
             .then((response: AxiosResponse) => {
-                returnData(response.data)
+                res.send(response.data)
             })
-            .catch((error: AxiosError) => console.log(`axios error: ${error.message}`))
+            .catch((error: AxiosError) => console.log(`>>>>>> axios error: ${error.message}`))
     })()
 })
 

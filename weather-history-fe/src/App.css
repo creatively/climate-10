@@ -2,6 +2,7 @@
   text-align: center;
   width:600px;
   height:300px;
+  font-family: arial, helvetica
 }
 
 @media (prefers-reduced-motion: no-preference) {
