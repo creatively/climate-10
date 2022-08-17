@@ -10,10 +10,10 @@ const c = (txt: string | number) => console.log(txt)
 export default function APICalls(address: string, numberOfPastYears: number, startMMDD: string, endMMDD: string, addYear: any): void  {
     const currentYear = DateTime.now().year
     const apiUrls: string[] = []
-    address = `Cardiff`
+    const apiOldUrls: string[] = []
 
-    console.log(`--- numberOfPastYears = ${numberOfPastYears}`)
-
+    // NEWER YEARS
+    
     for (let index=0; index<numberOfPastYears; index++) {
         const year: number = currentYear - index - 1
         const startYYYYMMDD: string = `${year}-${startMMDD}`
@@ -25,8 +25,7 @@ export default function APICalls(address: string, numberOfPastYears: number, sta
     }
 
     apiUrls.forEach((url) => {
-        console.log(`apiUrls.each item = ${url}`)
-        console.log(`--- url being called`)
+console.log(`url being called - ${url}`)
         axios.get((url))
             .then((response: AxiosResponse) => {
                 const { data } = response
@@ -40,8 +39,38 @@ export default function APICalls(address: string, numberOfPastYears: number, sta
             })
     })
 
+
+    // ---------- OLD YEARS ----------
+    /*
+    for (let index=0; index<numberOfPastYears; index++) {
+        const year: number = currentYear - 50 - index - 1
+        const startYYYYMMDD: string = `${year}-${startMMDD}`
+        const endYYYYMMDD: string = `${year}-${endMMDD}`     
+        const apiUrl = `http://localhost:8080/history?year=${year}&address=${address}&startDate=${startYYYYMMDD}&endDate=${endYYYYMMDD}`
+        apiOldUrls.push(apiUrl)
+    }
+
+    apiOldUrls.forEach((url) => {
+console.log(`--- apiUrls.each item = ${url}`)
+        axios.get((url))
+            .then((response: AxiosResponse) => {
+                const { data } = response
+                const _year: number = getYearFromData(data)
+                const _temperatures = getTemperaturesFromData(data)
+                addOldYear(
+                    _year,
+                    _temperatures
+                )
+console.log(`--- old year added : ${_year}`)
+            })
+            .catch((error: AxiosError) => {
+                console.log(error.message)
+            })
+    })
+    */
+
     function getYearFromData(data: any) {
-        const year = Number(data.days[0].datetime.substring(0,4)) || 9999
+        const year = Number(data.days[0].datetime.substring(0,4))
         return year
     }
 
