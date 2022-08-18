@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useEffectOnce } from './others-hooks/useEffectOnce'
 import { useStore } from './weather-history-store'
-import { VictoryChart, VictoryLine } from 'victory'
+import { VictoryChart, VictoryAxis, VictoryLabel, VictoryLine } from 'victory'
 import { DateTime } from 'luxon'
 import { Year, Years, YearsState } from './interfaces'
 import APICalls from './APICalls'
@@ -17,20 +17,50 @@ export default function App() {
   const [ averagesAcrossYears, setAveragesAcrossYears ] = useState<number[]>([])
 
   const startDateMMDD: string = `01-01`
-  const finishDateMMDD: string = `01-08`
-  const numberOfDaysToGet: number = 8  // ^
+  const finishDateMMDD: string = `12-31`
+  const numberOfDaysToGet: number = 365  // ^
   const numberOfYearsToGet: number = 3
+  const runningAverageSpread: number = 20
   const address: string = `london`
+
+
+  function getRunningAverages(arrayOfNumbers: any, spreadSize: number) {
+    let arrayRunningAveragedItems: number[] = []
+
+    // initial items before spreadSize is reached
+    for (let itemIndex: number=0; itemIndex < spreadSize; itemIndex++) { 
+      let cumulativeTotalOfCurrentNumber: number = 0
+      for (let positionIndex: number=0; positionIndex < itemIndex; positionIndex++) {
+          cumulativeTotalOfCurrentNumber += arrayOfNumbers[positionIndex]
+      }
+      const runningAveragedItem: number = Math.round(cumulativeTotalOfCurrentNumber / itemIndex)
+      arrayRunningAveragedItems.push(runningAveragedItem)
+    }
+
+    // items where there are now more items than spreadSize
+    for (let itemIndex: number = spreadSize - 1; itemIndex < arrayOfNumbers.length; itemIndex++) { 
+      let cumulativeTotalOfCurrentNumber: number = 0
+      for (let positionIndex: number = 0; positionIndex < spreadSize; positionIndex++) {
+          const indexOfItemToAdd: number = itemIndex - positionIndex
+          cumulativeTotalOfCurrentNumber += arrayOfNumbers[indexOfItemToAdd]
+      }
+      const runningAveragedItem: number = Math.round(cumulativeTotalOfCurrentNumber / spreadSize)
+      arrayRunningAveragedItems.push(runningAveragedItem)
+    }
+
+    // return the running averages array
+    return arrayRunningAveragedItems.filter(item => item === Number(item))
+  }
 
 
   // when year changes
   useEffect(() => {
     if (years.length > 0) {
       const arrMax: number[] = years.map(year => Math.max(...year.temperatures))
-      setAxisYmax(Math.max(...arrMax) + 1)
+      setAxisYmax(Math.max(...arrMax) + 3)
 
       const arrMin: number[] = years.map(year => Math.min(...year.temperatures))
-      setAxisYmin(Math.min(...arrMin) - 1)
+      setAxisYmin(Math.min(...arrMin) - 3)
 
       // calculate & set temperature average by day of previous years
       function average(array: number[]) {
@@ -41,7 +71,7 @@ export default function App() {
       }
 
       let arrayAverages: number[] = []
-      for (let daysIndex=0; daysIndex<numberOfDaysToGet; daysIndex++) {
+      for (let daysIndex: number = 0; daysIndex < numberOfDaysToGet; daysIndex++) {
         let arrayDay: number[] = []
         for (let yearsIndex=0; yearsIndex<numberOfDaysToGet; yearsIndex++) {
           if (years[yearsIndex] && years[yearsIndex].temperatures[daysIndex]) {
@@ -50,7 +80,8 @@ export default function App() {
         }
         arrayAverages.push(average(arrayDay))
       }
-      setAveragesAcrossYears(arrayAverages)
+      const arrayRunningAveraged: number[] = getRunningAverages(arrayAverages, runningAverageSpread)
+      setAveragesAcrossYears(arrayRunningAveraged)
     }
 
   }, [ years ])
@@ -64,12 +95,26 @@ export default function App() {
   return (
 
     <div className="App">
-      
+
       <VictoryChart
         maxDomain={{ y: axisYmax }}
         minDomain={{ y: axisYmin }}
         width={1200}
       >
+
+        <VictoryAxis 
+          domain={[0, numberOfDaysToGet]}
+          label={`Day`}
+        />
+        <VictoryAxis dependentAxis 
+          domain={[axisYmin, axisYmax]}
+          label={`Daily maximum temperatures`}
+          axisLabelComponent={<VictoryLabel dy={-10} />}
+          style={{
+            grid: {stroke: "#eee"},
+          }}
+        />
+
         {years.map((year: Year, index: number) => (
             <VictoryLine
               key={`key${index}`}
@@ -89,7 +134,8 @@ export default function App() {
           data={averagesAcrossYears}
           style={{
             data: {
-              stroke: "#444"
+              stroke: "#444",
+              strokeWidth: 4
             }
           }}
         />
