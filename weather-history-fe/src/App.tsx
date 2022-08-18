@@ -23,7 +23,7 @@ export default function App() {
   const address: string = `london`
 
 
-  // get min & max for graph axis Y
+  // when year changes
   useEffect(() => {
     if (years.length > 0) {
       const arrMax: number[] = years.map(year => Math.max(...year.temperatures))
@@ -32,59 +32,35 @@ export default function App() {
       const arrMin: number[] = years.map(year => Math.min(...year.temperatures))
       setAxisYmin(Math.min(...arrMin) - 1)
 
-      function sum(arr: number[]) {
-        return arr.reduce((a: number, b: number) => a + b, 0)
-      }
-
-      function getTotalsOfAPropertyInArrayOfObjects(arrayOfObjects: any, propertyName: string) {
-        const totals = arrayOfObjects.reduce((accumulator: any, object: any) => {
-          const sumOfAllTemperaturesOnThatDayOfTheYear = sum(object[propertyName])
-          return accumulator + sumOfAllTemperaturesOnThatDayOfTheYear
-        }, 0)
-        return totals
-      }
-
-      let arrayDayTemperatureTotals: number[] = getTotalsOfAPropertyInArrayOfObjects(years, `temperatures`)
-      //let arrayDayTemperatureAverages: number[] = []
-      
-
-
-
-      console.log(`arrayDayTemperatureTotals = `, arrayDayTemperatureTotals)
-      // for (arrayDayTemperatureTotals) 
-      // arrayDayTemperatureAverages[index]
-
-
-      //setAveragesAcrossYears(arrayDayTemperatureAverages)
-
-    }
-
-      /*
-      years.forEach((year: Year) => {
-        year.temperatures.forEach((day: number, dayIndex: number) => {
-          const newTotal = Number(TOTALS_ARRAY[dayIndex]) + Number(day)
-          TOTALS_ARRAY[dayIndex] = newTotal
+      // calculate & set temperature average by day of previous years
+      function average(array: number[]) {
+        const total = array.reduce((prev, cur) => {
+          return prev + cur;
         })
-      })
-console.log(`const  = ....`)
-console.log(TOTALS_ARRAY)
+        return Math.round(total / array.length)
+      }
 
-      const arrayOfAverageTemps: number[] = []
-      TOTALS_ARRAY.forEach((dayValue: number) => {
-        arrayOfAverageTemps.push(Math.ceil(dayValue / years.length))
-      })
-
-      setAveragesAcrossYears(arrayOfAverageTemps)
-      */
+      let arrayAverages: number[] = []
+      for (let daysIndex=0; daysIndex<numberOfDaysToGet; daysIndex++) {
+        let arrayDay: number[] = []
+        for (let yearsIndex=0; yearsIndex<numberOfDaysToGet; yearsIndex++) {
+          if (years[yearsIndex] && years[yearsIndex].temperatures[daysIndex]) {
+            arrayDay.push(years[yearsIndex].temperatures[daysIndex])
+          }
+        }
+        arrayAverages.push(average(arrayDay))
+      }
+      setAveragesAcrossYears(arrayAverages)
+    }
 
   }, [ years ])
 
+  // on first render
   useEffectOnce(() => {
-    //            no. of years ,  [ start-fin MM-DDs ]
     APICalls(address, numberOfYearsToGet, startDateMMDD, finishDateMMDD, addYear)
   })
 
-console.log(averagesAcrossYears)
+
   return (
 
     <div className="App">
@@ -101,19 +77,19 @@ console.log(averagesAcrossYears)
               data={year.temperatures}
               style={{
                 data: {
-                  stroke: "#A52A2A"
+                  stroke: "#ccc"
                 }
               }}
             />
         ))}
-    
+
         <VictoryLine
           key={`key_averages`}
           interpolation="natural"
-          data={[20, 22, 23, 22, 22, 25, 24, 20]}
+          data={averagesAcrossYears}
           style={{
             data: {
-              stroke: "#fc0fc0"
+              stroke: "#444"
             }
           }}
         />
