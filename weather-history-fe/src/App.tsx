@@ -16,18 +16,28 @@ export default function App() {
   const [ axisYmax, setAxisYmax ] = useState<number>(0)
   const [ averagesAcrossYears, setAveragesAcrossYears ] = useState<number[]>([])
 
+  const weatherParameter: string = `tempmax`
   const startDateMMDD: string = `01-01`
   const finishDateMMDD: string = `12-31`
   const numberOfDaysToGet: number = 365  // ^
-  const numberOfYearsToGet: number = 3
+  const numberOfYearsToGet: number = 5
   const runningAverageSpread: number = 20
   const address: string = `london`
 
 
+  // utility function - averages numbers
+  function average(array: number[]) {
+    const total = array.reduce((prev, cur) => {
+      return prev + cur;
+    })
+    return Math.round(total / array.length)
+  }
+
+  // utility function - running-average array from an array of numbers
   function getRunningAverages(arrayOfNumbers: any, spreadSize: number) {
     let arrayRunningAveragedItems: number[] = []
 
-    // initial items before spreadSize is reached
+    // average-out initial items in the array before spreadSize is reached
     for (let itemIndex: number=0; itemIndex < spreadSize; itemIndex++) { 
       let cumulativeTotalOfCurrentNumber: number = 0
       for (let positionIndex: number=0; positionIndex < itemIndex; positionIndex++) {
@@ -37,7 +47,7 @@ export default function App() {
       arrayRunningAveragedItems.push(runningAveragedItem)
     }
 
-    // items where there are now more items than spreadSize
+    // average-out all other items
     for (let itemIndex: number = spreadSize - 1; itemIndex < arrayOfNumbers.length; itemIndex++) { 
       let cumulativeTotalOfCurrentNumber: number = 0
       for (let positionIndex: number = 0; positionIndex < spreadSize; positionIndex++) {
@@ -55,30 +65,28 @@ export default function App() {
 
   // when year changes
   useEffect(() => {
+
     if (years.length > 0) {
+
+      // when 'year' changes, obtain the latest min/max values to size the graph axis
       const arrMax: number[] = years.map(year => Math.max(...year.temperatures))
       setAxisYmax(Math.max(...arrMax) + 3)
 
       const arrMin: number[] = years.map(year => Math.min(...year.temperatures))
       setAxisYmin(Math.min(...arrMin) - 3)
 
-      // calculate & set temperature average by day of previous years
-      function average(array: number[]) {
-        const total = array.reduce((prev, cur) => {
-          return prev + cur;
-        })
-        return Math.round(total / array.length)
-      }
-
+      // calculate & set the running-average temperature for x days over x years
       let arrayAverages: number[] = []
       for (let daysIndex: number = 0; daysIndex < numberOfDaysToGet; daysIndex++) {
         let arrayDay: number[] = []
         for (let yearsIndex=0; yearsIndex<numberOfDaysToGet; yearsIndex++) {
-          if (years[yearsIndex] && years[yearsIndex].temperatures[daysIndex]) {
-            arrayDay.push(years[yearsIndex].temperatures[daysIndex])
+          if (years[yearsIndex] && years[yearsIndex]?.temperatures[daysIndex]) {
+            arrayDay.push(years[yearsIndex]?.temperatures[daysIndex])
           }
         }
-        arrayAverages.push(average(arrayDay))
+        if (arrayDay?.length > 0) {
+          arrayAverages.push(average(arrayDay))
+        }
       }
       const arrayRunningAveraged: number[] = getRunningAverages(arrayAverages, runningAverageSpread)
       setAveragesAcrossYears(arrayRunningAveraged)
@@ -86,9 +94,9 @@ export default function App() {
 
   }, [ years ])
 
-  // on first render
+  // call BE api for data on first render
   useEffectOnce(() => {
-    APICalls(address, numberOfYearsToGet, startDateMMDD, finishDateMMDD, addYear)
+    APICalls(address, numberOfYearsToGet, startDateMMDD, finishDateMMDD, addYear, weatherParameter)
   })
 
 
@@ -97,13 +105,11 @@ export default function App() {
     <div className="App">
 
       <VictoryChart
-        maxDomain={{ y: axisYmax }}
-        minDomain={{ y: axisYmin }}
         width={1200}
       >
 
-        <VictoryAxis 
-          domain={[0, numberOfDaysToGet]}
+        <VictoryAxis
+          domain={[0, numberOfDaysToGet]} 
           label={`Day`}
         />
         <VictoryAxis dependentAxis 

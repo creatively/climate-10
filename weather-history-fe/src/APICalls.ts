@@ -7,7 +7,15 @@ import axios, { AxiosError, AxiosResponse } from 'axios'
 const c = (txt: string | number) => console.log(txt)
 
 
-export default function APICalls(address: string, numberOfPastYears: number, startMMDD: string, endMMDD: string, addYear: any): void  {
+export default function APICalls(
+        address: string, 
+        numberOfPastYears: number, 
+        startMMDD: string, 
+        endMMDD: string, 
+        addYear: any, 
+        weatherParameter: string
+    ): void  {
+
     const currentYear = DateTime.now().year
     const apiUrls: string[] = []
     const apiOldUrls: string[] = []
@@ -75,7 +83,7 @@ console.log(`--- old year added : ${_year}`)
     }
 
     function getTemperaturesFromData(data: any) {
-        const temperatues = data.days.map((day: any) => day.tempmax)
+        const temperatues = data.days.map((day: any) => day[weatherParameter])
         return temperatues
     }
 }
