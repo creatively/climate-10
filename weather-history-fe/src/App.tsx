@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useEffectOnce } from './others-hooks/useEffectOnce'
 import { useStore } from './weather-history-store'
-import { VictoryChart, VictoryAxis, VictoryLabel, VictoryLine } from 'victory'
+import { VictoryChart, VictoryAxis, VictoryBar, VictoryTooltip, VictoryLabel, VictoryLine } from 'victory'
 import { DateTime } from 'luxon'
 import { Year, Years, YearsState } from './interfaces'
 import APICalls from './APICalls'
@@ -17,11 +17,12 @@ export default function App() {
   const [ averagesAcrossYears, setAveragesAcrossYears ] = useState<number[]>([])
 
   const weatherParameter: string = `tempmax`
+  const yearsAgoStart: number = 0
   const startDateMMDD: string = `01-01`
   const finishDateMMDD: string = `12-31`
   const numberOfDaysToGet: number = 365  // ^
   const numberOfYearsToGet: number = 5
-  const runningAverageSpread: number = 20
+  const runningAverageSpread: number = 30
   const address: string = `london`
 
 
@@ -96,7 +97,7 @@ export default function App() {
 
   // call BE api for data on first render
   useEffectOnce(() => {
-    APICalls(address, numberOfYearsToGet, startDateMMDD, finishDateMMDD, addYear, weatherParameter)
+    APICalls(address, yearsAgoStart, numberOfYearsToGet, startDateMMDD, finishDateMMDD, addYear, weatherParameter)
   })
 
 
@@ -109,15 +110,22 @@ export default function App() {
       >
 
         <VictoryAxis
-          domain={[0, numberOfDaysToGet]} 
-          label={`Day`}
+          domain={[0,365]} 
+          label={`Month`}
+          axisLabelComponent={<VictoryLabel dy={5} />}
+          tickValues={[15, 46, 74, 105, 135, 167, 197, 227, 257, 288, 319, 349]}
+          tickFormat={['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec']}
         />
-        <VictoryAxis dependentAxis 
-          domain={[axisYmin, axisYmax]}
+        <VictoryAxis dependentAxis
           label={`Daily maximum temperatures`}
-          axisLabelComponent={<VictoryLabel dy={-10} />}
+          tickFormat={[-20,-15,-10,-5,0,5,10,15,20,25,30,35,40,45]}
+          domain={[axisYmin,axisYmax]}
+          axisLabelComponent={<VictoryLabel dy={-11} />}
           style={{
-            grid: {stroke: "#eee"},
+            grid: {
+              stroke: "#bbb",
+              strokeWidth: 1
+            }
           }}
         />
 
@@ -126,9 +134,11 @@ export default function App() {
               key={`key${index}`}
               interpolation="natural"
               data={year.temperatures}
+              label={year.year.toString()}
               style={{
                 data: {
-                  stroke: "#ccc"
+                  stroke: "#ddd",
+                  strokeWidth: 1
                 }
               }}
             />
@@ -141,7 +151,7 @@ export default function App() {
           style={{
             data: {
               stroke: "#444",
-              strokeWidth: 4
+              strokeWidth: 1
             }
           }}
         />

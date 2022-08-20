@@ -9,6 +9,7 @@ const c = (txt: string | number) => console.log(txt)
 
 export default function APICalls(
         address: string, 
+        yearsAgoStart: number,
         numberOfPastYears: number, 
         startMMDD: string, 
         endMMDD: string, 
@@ -22,7 +23,7 @@ export default function APICalls(
 
     // NEWER YEARS
     
-    for (let index=0; index<numberOfPastYears; index++) {
+    for (let index=yearsAgoStart; index<(numberOfPastYears + yearsAgoStart); index++) {
         const year: number = currentYear - index - 1
         const startYYYYMMDD: string = `${year}-${startMMDD}`
         const endYYYYMMDD: string = `${year}-${endMMDD}`
@@ -38,7 +39,7 @@ console.log(`url being called - ${url}`)
             .then((response: AxiosResponse) => {
                 const { data } = response
                 addYear(
-                    getYearFromData(data),
+                    Number(getYearFromData(data)),
                     getTemperaturesFromData(data)
                 )
             })
