@@ -9,5 +9,7 @@ export interface Years {
 
 export interface YearsState {
     years: Year[],
-    addYear: (year: number, temperatures: number[]) => void
+    oldYears: Year[],
+    addYear: (year: number, temperatures: number[]) => void,
+    addOldYear: (year: number, temperatures: number[]) => void
 }

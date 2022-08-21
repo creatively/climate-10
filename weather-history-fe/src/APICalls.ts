@@ -10,10 +10,12 @@ const c = (txt: string | number) => console.log(txt)
 export default function APICalls(
         address: string, 
         yearsAgoStart: number,
+        oldYearAgoStart: number,
         numberOfPastYears: number, 
         startMMDD: string, 
         endMMDD: string, 
         addYear: any, 
+        addOldYear: any,
         weatherParameter: string
     ): void  {
 
@@ -21,8 +23,7 @@ export default function APICalls(
     const apiUrls: string[] = []
     const apiOldUrls: string[] = []
 
-    // NEWER YEARS
-    
+    // RECENT YEARS
     for (let index=yearsAgoStart; index<(numberOfPastYears + yearsAgoStart); index++) {
         const year: number = currentYear - index - 1
         const startYYYYMMDD: string = `${year}-${startMMDD}`
@@ -32,6 +33,19 @@ export default function APICalls(
         const apiUrl = `http://localhost:8080/history?year=${year}&address=${address}&startDate=${startYYYYMMDD}&endDate=${endYYYYMMDD}`
         apiUrls.push(apiUrl)
     }
+
+console.log(`apiUrls = `, apiUrls)
+
+    // OLDER YEARS
+    for (let index=oldYearAgoStart; index<(numberOfPastYears + oldYearAgoStart); index++) {
+        const year: number = currentYear - index - 1
+        const startYYYYMMDD: string = `${year}-${startMMDD}`
+        const endYYYYMMDD: string = `${year}-${endMMDD}`
+        const apiUrl = `http://localhost:8080/history?year=${year}&address=${address}&startDate=${startYYYYMMDD}&endDate=${endYYYYMMDD}`
+        apiOldUrls.push(apiUrl)
+    }
+
+    console.log(`apiOldUrls`, apiOldUrls)
 
     apiUrls.forEach((url) => {
 console.log(`url being called - ${url}`)
@@ -48,35 +62,21 @@ console.log(`url being called - ${url}`)
             })
     })
 
-
-    // ---------- OLD YEARS ----------
-    /*
-    for (let index=0; index<numberOfPastYears; index++) {
-        const year: number = currentYear - 50 - index - 1
-        const startYYYYMMDD: string = `${year}-${startMMDD}`
-        const endYYYYMMDD: string = `${year}-${endMMDD}`     
-        const apiUrl = `http://localhost:8080/history?year=${year}&address=${address}&startDate=${startYYYYMMDD}&endDate=${endYYYYMMDD}`
-        apiOldUrls.push(apiUrl)
-    }
-
     apiOldUrls.forEach((url) => {
-console.log(`--- apiUrls.each item = ${url}`)
+        console.log(`url being called (old) - ${url}`)
         axios.get((url))
             .then((response: AxiosResponse) => {
                 const { data } = response
-                const _year: number = getYearFromData(data)
-                const _temperatures = getTemperaturesFromData(data)
                 addOldYear(
-                    _year,
-                    _temperatures
+                    Number(getYearFromData(data)),
+                    getTemperaturesFromData(data)
                 )
-console.log(`--- old year added : ${_year}`)
             })
             .catch((error: AxiosError) => {
                 console.log(error.message)
             })
     })
-    */
+
 
     function getYearFromData(data: any) {
         const year = Number(data.days[0].datetime.substring(0,4))

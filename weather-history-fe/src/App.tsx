@@ -11,19 +11,22 @@ import './App.css';
 export default function App() {
 
   const { years, addYear } = useStore()
-  //const { oldYears, addOldYear } = useStore()
+  const { oldYears, addOldYear } = useStore()
   const [ axisYmin, setAxisYmin ] = useState<number>(0)
   const [ axisYmax, setAxisYmax ] = useState<number>(0)
   const [ averagesAcrossYears, setAveragesAcrossYears ] = useState<number[]>([])
+  const [ oldAveragesAcrossYears, setOldAveragesAcrossYears ] = useState<number[]>([])
+
 
   const weatherParameter: string = `tempmax`
   const yearsAgoStart: number = 0
+  const oldYearsAgoStart: number = 10
   const startDateMMDD: string = `01-01`
   const finishDateMMDD: string = `12-31`
   const numberOfDaysToGet: number = 365  // ^
   const numberOfYearsToGet: number = 5
-  const runningAverageSpread: number = 30
-  const address: string = `london`
+  const runningAverageSpread: number = 20
+  const address: string = `nicosia`
 
 
   // utility function - averages numbers
@@ -95,9 +98,35 @@ export default function App() {
 
   }, [ years ])
 
+
+  // when oldYears changes
+  useEffect(() => {
+
+    if (oldYears.length > 0) {
+
+      // calculate & set the running-average temperature for x days over x years
+      let arrayAverages: number[] = []
+      for (let daysIndex: number = 0; daysIndex < numberOfDaysToGet; daysIndex++) {
+        let arrayDay: number[] = []
+        for (let oldYearsIndex=0; oldYearsIndex<numberOfDaysToGet; oldYearsIndex++) {
+          if (oldYears[oldYearsIndex] && oldYears[oldYearsIndex]?.temperatures[daysIndex]) {
+            arrayDay.push(oldYears[oldYearsIndex]?.temperatures[daysIndex])
+          }
+        }
+        if (arrayDay?.length > 0) {
+          arrayAverages.push(average(arrayDay))
+        }
+      }
+      const arrayRunningAveraged: number[] = getRunningAverages(arrayAverages, runningAverageSpread)
+      setOldAveragesAcrossYears(arrayRunningAveraged)
+    }
+
+  }, [ oldYears ])
+
+
   // call BE api for data on first render
   useEffectOnce(() => {
-    APICalls(address, yearsAgoStart, numberOfYearsToGet, startDateMMDD, finishDateMMDD, addYear, weatherParameter)
+    APICalls(address, yearsAgoStart, oldYearsAgoStart, numberOfYearsToGet, startDateMMDD, finishDateMMDD, addYear, addOldYear, weatherParameter)
   })
 
 
@@ -131,7 +160,7 @@ export default function App() {
 
         {years.map((year: Year, index: number) => (
             <VictoryLine
-              key={`key${index}`}
+              key={`key_year_${index}`}
               interpolation="natural"
               data={year.temperatures}
               label={year.year.toString()}
@@ -151,6 +180,33 @@ export default function App() {
           style={{
             data: {
               stroke: "#444",
+              strokeWidth: 1
+            }
+          }}
+        />
+
+        {oldYears.map((oldYear: Year, index: number) => (
+            <VictoryLine
+              key={`key_oldyear_${index}`}
+              interpolation="natural"
+              data={oldYear.temperatures}
+              label={oldYear.year.toString()}
+              style={{
+                data: {
+                  stroke: "#fc0fc0",
+                  strokeWidth: 1
+                }
+              }}
+            />
+        ))}
+
+        <VictoryLine
+          key={`key_old_averages`}
+          interpolation="natural"
+          data={oldAveragesAcrossYears}
+          style={{
+            data: {
+              stroke: "#fa9fa9",
               strokeWidth: 1
             }
           }}
