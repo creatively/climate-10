@@ -25,7 +25,7 @@ export default function App() {
   const finishDateMMDD: string = `12-31`
   const numberOfDaysToGet: number = 365  // ^
   const numberOfYearsToGet: number = 5
-  const runningAverageSpread: number = 20
+  const runningAverageSpread: number = 15
   const address: string = `nicosia`
 
 
@@ -134,16 +134,14 @@ export default function App() {
 
     <div className="App">
 
-      <VictoryChart
-        width={1200}
-      >
+      <VictoryChart>
 
         <VictoryAxis
           domain={[0,365]} 
           label={`Month`}
           axisLabelComponent={<VictoryLabel dy={5} />}
           tickValues={[15, 46, 74, 105, 135, 167, 197, 227, 257, 288, 319, 349]}
-          tickFormat={['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec']}
+          tickFormat={['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']}
         />
         <VictoryAxis dependentAxis
           label={`Daily maximum temperatures`}
@@ -166,26 +164,17 @@ export default function App() {
               label={year.year.toString()}
               style={{
                 data: {
-                  stroke: "#ddd",
+                  stroke: "#eee",
                   strokeWidth: 1
                 }
               }}
             />
         ))}
 
-        <VictoryLine
-          key={`key_averages`}
-          interpolation="natural"
-          data={averagesAcrossYears}
-          style={{
-            data: {
-              stroke: "#444",
-              strokeWidth: 1
-            }
-          }}
-        />
+
 
         {oldYears.map((oldYear: Year, index: number) => (
+
             <VictoryLine
               key={`key_oldyear_${index}`}
               interpolation="natural"
@@ -193,12 +182,24 @@ export default function App() {
               label={oldYear.year.toString()}
               style={{
                 data: {
-                  stroke: "#fc0fc0",
+                  stroke: "#eee",
                   strokeWidth: 1
                 }
               }}
             />
         ))}
+
+<VictoryLine
+          key={`key_averages`}
+          interpolation="natural"
+          data={averagesAcrossYears}
+          style={{
+            data: {
+              stroke: "red",
+              strokeWidth: 1
+            }
+          }}
+        />
 
         <VictoryLine
           key={`key_old_averages`}
@@ -206,7 +207,7 @@ export default function App() {
           data={oldAveragesAcrossYears}
           style={{
             data: {
-              stroke: "#fa9fa9",
+              stroke: "blue",
               strokeWidth: 1
             }
           }}

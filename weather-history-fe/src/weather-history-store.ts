@@ -21,8 +21,8 @@ export const useStore = create<YearsState>((set) => ({
 
     addOldYear: (year: number, temperatures: number[]): void => {
         set((state) => ({
-          years: [
-            ...state.years,
+          oldYears: [
+            ...state.oldYears,
             {
               year: year,
               temperatures: temperatures,

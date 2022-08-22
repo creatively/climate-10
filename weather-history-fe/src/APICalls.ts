@@ -52,6 +52,7 @@ console.log(`url being called - ${url}`)
         axios.get((url))
             .then((response: AxiosResponse) => {
                 const { data } = response
+console.log(`--- url Axios response - temps =`, getTemperaturesFromData(data))
                 addYear(
                     Number(getYearFromData(data)),
                     getTemperaturesFromData(data)
@@ -67,6 +68,7 @@ console.log(`url being called - ${url}`)
         axios.get((url))
             .then((response: AxiosResponse) => {
                 const { data } = response
+console.log(`--- oldUrl Axios response - temps =`, getTemperaturesFromData(data))
                 addOldYear(
                     Number(getYearFromData(data)),
                     getTemperaturesFromData(data)
