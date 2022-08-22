@@ -16,7 +16,7 @@ export default function App() {
   const [ axisYmax, setAxisYmax ] = useState<number>(0)
   const [ averagesAcrossYears, setAveragesAcrossYears ] = useState<number[]>([])
   const [ oldAveragesAcrossYears, setOldAveragesAcrossYears ] = useState<number[]>([])
-
+  const [ yearsIncrease, setYearsIncrease] = useState<number>(0)
 
   const weatherParameter: string = `tempmax`
   const yearsAgoStart: number = 0
@@ -25,17 +25,23 @@ export default function App() {
   const finishDateMMDD: string = `12-31`
   const numberOfDaysToGet: number = 365  // ^
   const numberOfYearsToGet: number = 5
-  const runningAverageSpread: number = 15
-  const address: string = `nicosia`
+  const runningAverageSpread: number = 25
+  const address: string = `Denver`
 
 
   // utility function - averages numbers
   function average(array: number[]) {
-    const total = array.reduce((prev, cur) => {
-      return prev + cur;
-    })
-    return Math.round(total / array.length)
+    let result = 0
+    if (array.length > 0) {
+      const total = array.reduce((prev, cur) => {
+        return prev + cur;
+      })
+      result = Math.round(total / array.length)
+    }
+    return result
   }
+
+  const monthNumOfDays  = [31,28,31,30,31,30,31,31,30,31,30,31]
 
   // utility function - running-average array from an array of numbers
   function getRunningAverages(arrayOfNumbers: any, spreadSize: number) {
@@ -123,6 +129,27 @@ export default function App() {
 
   }, [ oldYears ])
 
+  useEffect(() => {
+
+    const newTempsTotal: number = 
+      average(years.map((year) => {
+        return year.temperatures.reduce((dayTemperatureSoFar: number, nextDayTemperature: number) => {
+          return dayTemperatureSoFar + nextDayTemperature
+        })
+      }))
+
+    const oldTempsTotal: number = 
+      average(oldYears.map((year) => {
+        return year.temperatures.reduce((dayTemperatureSoFar: number, nextDayTemperature: number) => {
+          return dayTemperatureSoFar + nextDayTemperature
+        })
+      }))
+
+    const increase: number = Number(((newTempsTotal - oldTempsTotal) / 365).toFixed(1))
+    setYearsIncrease(increase)
+
+  }, [ years, oldYears])
+
 
   // call BE api for data on first render
   useEffectOnce(() => {
@@ -134,27 +161,14 @@ export default function App() {
 
     <div className="App">
 
-      <VictoryChart>
+      <h2>{address}'s local climate change increase is { yearsIncrease }'C in the last 10 years</h2>
+      <div className="new-years">2016-2021</div>
+      <div className="old-years">2006-2011</div>
+      
 
-        <VictoryAxis
-          domain={[0,365]} 
-          label={`Month`}
-          axisLabelComponent={<VictoryLabel dy={5} />}
-          tickValues={[15, 46, 74, 105, 135, 167, 197, 227, 257, 288, 319, 349]}
-          tickFormat={['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']}
-        />
-        <VictoryAxis dependentAxis
-          label={`Daily maximum temperatures`}
-          tickFormat={[-20,-15,-10,-5,0,5,10,15,20,25,30,35,40,45]}
-          domain={[axisYmin,axisYmax]}
-          axisLabelComponent={<VictoryLabel dy={-11} />}
-          style={{
-            grid: {
-              stroke: "#bbb",
-              strokeWidth: 1
-            }
-          }}
-        />
+      <VictoryChart
+        padding={{ top: 0, bottom: 0 }}
+      >
 
         {years.map((year: Year, index: number) => (
             <VictoryLine
@@ -171,8 +185,6 @@ export default function App() {
             />
         ))}
 
-
-
         {oldYears.map((oldYear: Year, index: number) => (
 
             <VictoryLine
@@ -182,20 +194,20 @@ export default function App() {
               label={oldYear.year.toString()}
               style={{
                 data: {
-                  stroke: "#eee",
+                  stroke: "#e5e5e5",
                   strokeWidth: 1
                 }
               }}
             />
         ))}
 
-<VictoryLine
+        <VictoryLine
           key={`key_averages`}
           interpolation="natural"
           data={averagesAcrossYears}
           style={{
             data: {
-              stroke: "red",
+              stroke: "crimson",
               strokeWidth: 1
             }
           }}
@@ -207,7 +219,32 @@ export default function App() {
           data={oldAveragesAcrossYears}
           style={{
             data: {
-              stroke: "blue",
+              stroke: "dodgerblue",
+              strokeWidth: 1
+            }
+          }}
+        />
+
+        <VictoryAxis
+          domain={[0,365]} 
+          axisLabelComponent={<VictoryLabel dy={5} />}
+          tickLabelComponent={<VictoryLabel dy={-7} style={{fontSize: '10px'}} />}
+          tickValues={[15, 46, 74, 105, 135, 167, 197, 227, 257, 288, 319, 349]}
+          tickFormat={['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']}
+        />
+        <VictoryAxis dependentAxis
+          label={`Daily maximum temperature 'C`}
+          tickFormat={[-30,-25,-20,-15,-10,-5,0,5,10,15,20,25,30,35,40,45,50]}
+          domain={[axisYmin,axisYmax]}
+          axisLabelComponent={<VictoryLabel dy={-11} />}
+          tickLabelComponent={<VictoryLabel dy={0} style={{fontSize: '10px'}} />}
+          style={{
+            axisLabel: {
+              fontSize: 12,
+              padding: 30
+            },
+            grid: {
+              stroke: "#bbb",
               strokeWidth: 1
             }
           }}

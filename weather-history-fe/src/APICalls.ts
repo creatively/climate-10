@@ -34,8 +34,6 @@ export default function APICalls(
         apiUrls.push(apiUrl)
     }
 
-console.log(`apiUrls = `, apiUrls)
-
     // OLDER YEARS
     for (let index=oldYearAgoStart; index<(numberOfPastYears + oldYearAgoStart); index++) {
         const year: number = currentYear - index - 1
@@ -45,14 +43,11 @@ console.log(`apiUrls = `, apiUrls)
         apiOldUrls.push(apiUrl)
     }
 
-    console.log(`apiOldUrls`, apiOldUrls)
 
     apiUrls.forEach((url) => {
-console.log(`url being called - ${url}`)
         axios.get((url))
             .then((response: AxiosResponse) => {
                 const { data } = response
-console.log(`--- url Axios response - temps =`, getTemperaturesFromData(data))
                 addYear(
                     Number(getYearFromData(data)),
                     getTemperaturesFromData(data)
@@ -64,11 +59,9 @@ console.log(`--- url Axios response - temps =`, getTemperaturesFromData(data))
     })
 
     apiOldUrls.forEach((url) => {
-        console.log(`url being called (old) - ${url}`)
         axios.get((url))
             .then((response: AxiosResponse) => {
                 const { data } = response
-console.log(`--- oldUrl Axios response - temps =`, getTemperaturesFromData(data))
                 addOldYear(
                     Number(getYearFromData(data)),
                     getTemperaturesFromData(data)

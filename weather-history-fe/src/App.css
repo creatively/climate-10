@@ -1,8 +1,27 @@
 .App {
   text-align: center;
-  width:1200px;
-  height:800px;
-  font-family: arial, helvetica
+  height:600px;
+  font-family: arial, helvetica;
+  font-weight: 400;
+  font-size: 16px;
+}
+
+h2 {
+  font-weight: 400;
+  margin-bottom: 6px;
+}
+
+.old-years,
+.new-years {
+  font-size: 22px;
+}
+
+.old-years {
+  color: dodgerblue;
+}
+
+.new-years {
+  color: crimson;
 }
 
 @media (prefers-reduced-motion: no-preference) {
