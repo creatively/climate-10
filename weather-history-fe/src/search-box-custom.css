@@ -1,0 +1,105 @@
+.search-box-custom {
+    position: relative;
+    font-size:16px;
+    z-index:2;
+}
+    .inputbox {
+        height: 52px;
+        width: calc(100% - 81px);
+        padding: 0 40px;
+        border: 0;
+        max-width: 680px;
+        font-size: 1.7em;
+        text-align:center;
+    }
+
+    .inputbox:focus {
+        outline: none;
+    }
+
+    .inputbox-loader-container {
+        background: #eee;
+        height: 100%;
+        width: 100%;
+        padding: 0;
+    }
+    .inputbox-loader-container--visible {
+        height: 100px;
+    }
+
+    .inputbox-loader-image {
+        position: absolute;
+        margin-right: 10px;
+        top: 15px;
+        left: 16px;
+        height: 23px;
+    }
+
+    .forecast-loader-container {
+        width: 100%;
+        height: 191px;
+        margin-top: 16px;
+        background: white;
+    }
+
+    .forecast-loader {
+        margin-top: 54px;
+        height: 30px;
+        width: 30px;
+    }
+
+    ul.city-options--hidden {
+        display: none;
+    }
+
+    ul.city-options--visible {
+        position: absolute;
+        top: 52px;
+        display: block;
+        background-color: white;
+        padding-right: 20px;
+        border-top:0;
+        padding-top:8px;
+    }
+
+        .city-option {
+            margin-top:2px;
+            margin-left: 11px;
+            padding:2px 0px;
+            cursor: pointer;
+            border-bottom: 1px dotted #ddd;
+            text-align:left;
+        }
+        .city-option--lastone {
+            margin-left: 11px;
+            opacity: 0.15
+        }
+        .city-option--lastbutone {
+            margin-left: 11px;
+            opacity: 0.4
+        }
+        .city-option:hover .label,
+        .city-option:focus .label {
+            background: #f5f5f5;
+        }
+            .flag {
+                top:1px;
+                height: 13px;
+                width: 20px;
+                margin-right: 10px;
+            }
+            .regionCode {
+                margin-left:8px;
+                color: #aaa;
+                font-size:14px;
+            }
+
+    .error-message {
+        display: none;
+        color: orangered;
+        background: white;
+        padding: 7px;
+    }
+    .error-message--show {
+        display:block;
+    }

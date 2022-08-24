@@ -1,28 +1,121 @@
 .App {
   text-align: center;
   height:600px;
-  font-family: arial, helvetica;
-  font-weight: 400;
-  font-size: 16px;
+  font-family:'Volkhov', arial;
+  font-weight:400;
 }
+
+.main {
+  margin: 20px 0 0;
+}
+
+/* ----- styles for local implementation of <CustomSearchBox> -- start */
+.search-box-container {
+  max-width: 510px;
+  margin: 0 auto;
+  border: 0;
+  position: relative;
+}
+  .search-box-custom {
+    border-radius: 24px;
+    border: 2px solid #555;
+  }
+
+    .inputbox {
+      padding-left:60px;
+      padding-right:20px;
+      text-align:left;
+      font-family:'Volkhov', arial;
+      font-size:1.4em;
+      border-radius:2px;
+      height:42px;
+      background: transparent;
+    }
+
+      .inputbox::placeholder {
+        color: #ccc;
+        font-size: 0.9em;
+      }
+
+      .inputbox-loader-image {
+        top:9px;
+      }
+
+  .city-options--visible {
+    margin-top: 0;
+    list-style-type: none;
+    padding-left: 22px;
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+  }
+/* ----- styles for local implementation of <CustomSearchBox> -- end */
 
 h2 {
   font-weight: 400;
-  margin-bottom: 6px;
+  margin: 8px 0 14px;
+  background: #777;
+  padding: 8px;
+  color: white;
 }
 
-.old-years,
-.new-years {
-  font-size: 22px;
+.key-years {
+  font-weight: 700;
+  margin: 10px 0 12px;
 }
 
-.old-years {
-  color: dodgerblue;
+  .old-years,
+  .new-years,
+  .key-years-text {
+    display:inline-block;
+    padding: 0 4px;
+  }
+
+  .old-years,
+  .new-years {
+    font-size: 22px;
+  }
+
+  .old-years {
+    color: dodgerblue;
+  }
+
+  .key-years-text {
+    margin: 2px 0;
+    color: #555;
+    line-height: 12px;
+  }
+
+  .new-years {
+    color: crimson;
+  }
+
+  .chart-container {
+    margin: 0 auto;
+    height:400px;
+    width:800px;
+  }
+
+  .results-text {
+    font-size: 28px;
+    font-family: arial;
+    font-weight: 700;
+    width: 120px;
+    margin: 6px auto 0;
+    background: darkred;
+    color: white;
+    padding: 6px 0;
+    border-radius: 0 20px 20px 0;
+    position: absolute;
+    top: -5px;
+    right: 0;
+    z-index:2;
+  }
+
+.VictoryContainer {
+  height:500px;
+  width:900px;
 }
 
-.new-years {
-  color: crimson;
-}
 
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
