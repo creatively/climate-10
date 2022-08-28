@@ -28,9 +28,9 @@ export default function APICalls(
         const startYYYYMMDD: string = `${year}-${startMMDD}`
         const endYYYYMMDD: string = `${year}-${endMMDD}`
         // --- expect a bug here where startDate is between Dec 16 & Dec 31, as year overlap
-
-const apiUrl: string = `http://localhost:8080/history?year=${year}&address=London&startDate=${startYYYYMMDD}&endDate=${endYYYYMMDD}`
-
+console.log(address)
+const apiUrl: string = `http://localhost:8080/history?year=${year}&address=${address}&startDate=${startYYYYMMDD}&endDate=${endYYYYMMDD}`
+console.log(address)
         apiUrls.push(apiUrl)
     }
 
@@ -39,7 +39,7 @@ const apiUrl: string = `http://localhost:8080/history?year=${year}&address=Londo
         const year: number = currentYear - index - 1
         const startYYYYMMDD: string = `${year}-${startMMDD}`
         const endYYYYMMDD: string = `${year}-${endMMDD}`
-        const apiUrl = `http://localhost:8080/history?year=${year}&address=London&startDate=${startYYYYMMDD}&endDate=${endYYYYMMDD}`
+        const apiUrl = `http://localhost:8080/history?year=${year}&address=${address}&startDate=${startYYYYMMDD}&endDate=${endYYYYMMDD}`
         apiOldUrls.push(apiUrl)
     }
 

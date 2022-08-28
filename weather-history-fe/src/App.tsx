@@ -8,6 +8,7 @@ import APICalls from './APICalls'
 import SearchBoxCustom from './SearchBoxCustom'
 import './App.css'
 import WebFont from 'webfontloader'
+import { stringify } from 'querystring';
 
 
 export default function App() {
@@ -20,7 +21,7 @@ export default function App() {
   const [ averagesAcrossYears, setAveragesAcrossYears ] = useState<number[]>([])
   const [ oldAveragesAcrossYears, setOldAveragesAcrossYears ] = useState<number[]>([])
   const [ yearsIncrease, setYearsIncrease] = useState<number>(0)
-  const [ address, setAddress ] = useState<string>(``)
+  const [ address, setAddress ] = useState<string>('')
   const [ showResultsText, setShowResultsText ] = useState<boolean>(false)
   const [ showGraph, setShowGraph ] = useState<boolean>(false)
   const [ showLoader, setShowLoader ] = useState<boolean>(false)
@@ -52,9 +53,12 @@ export default function App() {
   // callback function from CustomSearchBox component
   function onSearchBoxUpdate(chosenCityDetails: ICityDetails) {
     console.log(`--- onSearchBoxUpdate function called`)
+    console.log(chosenCityDetails)
     setAddress(chosenCityDetails.label)
     setShowLoader(true)
-    doApiCalls()
+
+
+    doApiCalls(chosenCityDetails.label)
   }
 
   // utility function - averages numbers
@@ -185,7 +189,10 @@ export default function App() {
   }, [ years, oldYears])
 
 
-  function doApiCalls() {
+
+
+
+  function doApiCalls(address: string) {
     APICalls(
       address, 
       yearsAgoStart, 
