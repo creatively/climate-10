@@ -29,5 +29,14 @@ export const useStore = create<YearsState>((set) => ({
             } 
           ]
         }))
+    },
+
+    clearYears: (): void => {
+      set((state) => ({years: []}))
+    },
+
+    clearOldYears: (): void => {
+      set((state) => ({oldYears: []}))
     }
+
 }))

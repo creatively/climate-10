@@ -15,6 +15,7 @@ export default function App() {
 
   const { years, addYear } = useStore()
   const { oldYears, addOldYear } = useStore()
+  const { clearYears, clearOldYears } = useStore()
 
   const [ axisYmin, setAxisYmin ] = useState<number>(0)
   const [ axisYmax, setAxisYmax ] = useState<number>(0)
@@ -54,10 +55,11 @@ export default function App() {
   function onSearchBoxUpdate(chosenCityDetails: ICityDetails) {
     console.log(`--- onSearchBoxUpdate function called`)
     console.log(chosenCityDetails)
+    clearYears()
+    clearOldYears()
+    setShowGraph(false)
     setAddress(chosenCityDetails.label)
     setShowLoader(true)
-
-
     doApiCalls(chosenCityDetails.label)
   }
 
@@ -187,9 +189,6 @@ export default function App() {
     }
 
   }, [ years, oldYears])
-
-
-
 
 
   function doApiCalls(address: string) {
