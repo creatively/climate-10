@@ -20,7 +20,7 @@ console.log(req.url)
     const address: any = req.query.address
     const startDate: any = req.query.startDate
     const endDate: any = req.query.endDate
-    const apiUrl: string = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${address}/${startDate}/${endDate}?unitGroup=uk&key=ZG6RTP56DLKZJ8LWJCLVK4RM7&contentType=json`;
+    const apiUrl: string = encodeURI(`https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${address}/${startDate}/${endDate}?unitGroup=uk&key=ZG6RTP56DLKZJ8LWJCLVK4RM7&contentType=json`);
 
     (async () => {
         console.log(`about to axios`)

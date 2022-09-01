@@ -34,7 +34,7 @@ export default function App() {
   const finishDateMMDD: string = `12-31`
   const numberOfDaysToGet: number = 365  // ^
   const numberOfYearsToGet: number = 5
-  const runningAverageSpread: number = 25
+  const runningAverageSpread: number = 20
 
 
   interface ICityDetails {
@@ -48,7 +48,7 @@ export default function App() {
 
   // call once on first render
   useEffectOnce(() => {
-    WebFont.load({google: {families: ['Volkhov']}});
+    WebFont.load({google: {families: ['Monserrat','Volkhov']}});
   })
 
   // callback function from CustomSearchBox component
@@ -58,6 +58,7 @@ export default function App() {
     clearYears()
     clearOldYears()
     setShowGraph(false)
+    setShowResultsText(false)
     setAddress(chosenCityDetails.label)
     setShowLoader(true)
     doApiCalls(chosenCityDetails.label)
@@ -76,7 +77,7 @@ export default function App() {
   }
 
   // utility function - running-average array from an array of numbers
-  function getRunningAverages(arrayOfNumbers: any, spreadSize: number) {
+  function getRunningAverages(arrayOfNumbers: number[], spreadSize: number) {
     let arrayRunningAveragedItems: number[] = []
 
     // average-out initial items in the array before spreadSize is reached

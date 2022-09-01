@@ -1,7 +1,8 @@
 .App {
   text-align: center;
   height:600px;
-  font-family:'Volkhov', arial;
+  /*font-family:'Volkhov', arial;*/
+  font-family: 'Monserrat', arial;
   font-weight:400;
 }
 
@@ -25,7 +26,7 @@
       padding-left:60px;
       padding-right:20px;
       text-align:left;
-      font-family:'Volkhov', arial;
+      font-family:'Monserrat', arial;
       font-size:1.4em;
       border-radius:2px;
       height:42px;
@@ -51,7 +52,7 @@
 /* ----- styles for local implementation of <CustomSearchBox> -- end */
 
 h2 {
-  font-weight: 400;
+  font-weight: 700;
   margin: 8px 0 14px;
   background: #555;
   padding: 8px;
