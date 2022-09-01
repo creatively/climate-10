@@ -15,7 +15,7 @@ app.use(cors({
 }))
 
 app.get('/history', (req: Request, res: Response) => {
-console.log(req.url)
+console.log(`--- BE called with : ${req.url}`)
 
     const address: any = req.query.address
     const startDate: any = req.query.startDate
@@ -23,12 +23,14 @@ console.log(req.url)
     const apiUrl: string = encodeURI(`https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${address}/${startDate}/${endDate}?unitGroup=uk&key=ZG6RTP56DLKZJ8LWJCLVK4RM7&contentType=json`);
 
     (async () => {
-        console.log(`about to axios`)
         await axios(apiUrl)
             .then((response: AxiosResponse) => {
                 res.send(response.data)
             })
-            .catch((error: AxiosError) => console.log(`>>>>>> axios error: ${error.message}`))
+            .catch((error: AxiosError) => {
+                console.log(`>>>>>> axios error: ${error.message}`)
+                res.send(error)
+            })
     })()
 })
 

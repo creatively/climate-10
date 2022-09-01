@@ -23,6 +23,7 @@ export default function App() {
   const [ oldAveragesAcrossYears, setOldAveragesAcrossYears ] = useState<number[]>([])
   const [ yearsIncrease, setYearsIncrease] = useState<number>(0)
   const [ address, setAddress ] = useState<string>('')
+  const [ apiError, setApiError ] = useState<boolean>(false)
   const [ showResultsText, setShowResultsText ] = useState<boolean>(false)
   const [ showGraph, setShowGraph ] = useState<boolean>(false)
   const [ showLoader, setShowLoader ] = useState<boolean>(false)
@@ -191,6 +192,13 @@ export default function App() {
 
   }, [ years, oldYears])
 
+  useEffect(() => {
+    if (apiError === true) {
+      setShowLoader(false)
+      setShowGraph(false)
+    }
+  }, [ apiError ])
+
 
   function doApiCalls(address: string) {
     APICalls(
@@ -202,6 +210,7 @@ export default function App() {
       finishDateMMDD, 
       addYear, 
       addOldYear,
+      setApiError,
       weatherParameter
     )
   }
@@ -213,6 +222,7 @@ export default function App() {
       <div className="main">
 
         <h2>Find how much your local climate has changed in 10 years</h2>
+
         <div className="search-box-container">
           <SearchBoxCustom onSearchBoxUpdate={onSearchBoxUpdate} />
           { showResultsText ?
@@ -325,6 +335,11 @@ export default function App() {
             <img src="https://miro.medium.com/max/400/1*em5HcTFZIQw90qIgdbYjVg.gif" alt="loading" height="200" width="260" />
           </div>
         : `` 
+      }
+
+      { apiError ?
+        <div className="api-error">Unfortunately, there's been an error trying to get any weather data</div>
+        : ``
       }
 
       </div>

@@ -112,6 +112,11 @@ h2 {
     z-index:2;
   }
 
+.api-error {
+  color: darkred;
+  margin-top: 12px;
+}
+
 .VictoryContainer {
   height:500px;
   width:900px;

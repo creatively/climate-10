@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { SetStateAction, useEffect } from 'react'
 import { useStore } from './weather-history-store'
 import { DateTime } from 'luxon'
 import { Year, Years, YearsState } from './interfaces'
@@ -14,6 +14,7 @@ export default function APICalls(
         endMMDD: string, 
         addYear: any, 
         addOldYear: any,
+        setApiError: any,
         weatherParameter: string
     ): void  {
 
@@ -45,35 +46,39 @@ console.log(address)
 
     function callAPI() {
         apiUrls.forEach((url) => {
-    console.log(`--- new url bring called : ${url}`)
+    console.log(`--- new url REQUESTED ---->> : ${url}`)
             axios.get((url))
                 .then((response: AxiosResponse) => {
                     const { data } = response
-    console.log(`--- new url responded : ${url}`)
-                    addYear(
-                        Number(getYearFromData(data)),
-                        getTemperaturesFromData(data)
-                    )
+    console.log(`--- new url RESPONDED <<---- : ${url}`)
+                    if (data.name !== 'Error') {
+                        addYear(
+                            Number(getYearFromData(data)),
+                            getTemperaturesFromData(data)
+                        )
+                    } else {
+                        handleError(data)
+                    }
                 })
-                .catch((error: AxiosError) => {
-                    console.log(error.message)
-                })
+                .catch(handleError)
         })
 
         apiOldUrls.forEach((url) => {
-    console.log(`--- old url bring called : ${url}`)
+    console.log(`--- old url REQUESTED ---->> : ${url}`)
             axios.get((url))
                 .then((response: AxiosResponse) => {
                     const { data } = response
-    console.log(`--- old url responded : ${url}`)
-                    addOldYear(
-                        Number(getYearFromData(data)),
-                        getTemperaturesFromData(data)
-                    )
+    console.log(`--- old url RESPONDED <<---- : ${url}`)
+                    if (data.name !== 'Error') {
+                        addOldYear(
+                            Number(getYearFromData(data)),
+                            getTemperaturesFromData(data)
+                        )
+                    } else {
+                        handleError(data)
+                    }
                 })
-                .catch((error: AxiosError) => {
-                    console.log(error.message)
-                })
+                .catch(handleError)
         })
     }
 
@@ -88,4 +93,14 @@ console.log(address)
     }
 
     callAPI()
+
+    function handleError(error: AxiosError) {
+        console.log(error.message)
+        setApiError(true)
+/*
+
+NEXT : pass up apiError = true
+
+*/
+    }
 }
