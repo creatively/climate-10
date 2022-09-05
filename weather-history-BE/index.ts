@@ -25,11 +25,16 @@ console.log(`--- BE called with : ${req.url}`)
     (async () => {
         await axios(apiUrl)
             .then((response: AxiosResponse) => {
-                res.send(response.data)
+                res.status(200).send(response.data)
             })
             .catch((error: AxiosError) => {
-                console.log(`>>>>>> axios error: ${error.message}`)
-                res.send(error)
+                const apisErrorMessage: any = error.response?.data
+                if (apisErrorMessage?.includes(`Invalid location found`)) {
+                    console.log(`--- invalid location --- ${address}`)
+                    res.status(422).send(`--- invalid location --- ${address}`)
+                } else {
+                    res.status(503).send(error)
+                }
             })
     })()
 })

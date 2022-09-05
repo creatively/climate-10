@@ -3,6 +3,7 @@ import { useStore } from './weather-history-store'
 import { DateTime } from 'luxon'
 import { Year, Years, YearsState } from './interfaces'
 import axios, { AxiosError, AxiosResponse } from 'axios'
+import { CatchClause } from 'typescript'
 
 
 export default function APICalls(
@@ -14,7 +15,7 @@ export default function APICalls(
         endMMDD: string, 
         addYear: any, 
         addOldYear: any,
-        setApiError: any,
+        setApiErrorMessage: any,
         weatherParameter: string
     ): void  {
 
@@ -29,9 +30,8 @@ export default function APICalls(
         const startYYYYMMDD: string = `${year}-${startMMDD}`
         const endYYYYMMDD: string = `${year}-${endMMDD}`
         // --- expect a bug here where startDate is between Dec 16 & Dec 31, as year overlap
-console.log(address)
-const apiUrl: string = `http://localhost:8080/history?year=${year}&address=${address}&startDate=${startYYYYMMDD}&endDate=${endYYYYMMDD}`
-console.log(address)
+
+        const apiUrl: string = encodeURI(`http://localhost:8080/history?year=${year}&address=${address}&startDate=${startYYYYMMDD}&endDate=${endYYYYMMDD}`)
         apiUrls.push(apiUrl)
     }
 
@@ -40,7 +40,7 @@ console.log(address)
         const year: number = currentYear - index - 1
         const startYYYYMMDD: string = `${year}-${startMMDD}`
         const endYYYYMMDD: string = `${year}-${endMMDD}`
-        const apiUrl = `http://localhost:8080/history?year=${year}&address=${address}&startDate=${startYYYYMMDD}&endDate=${endYYYYMMDD}`
+        const apiUrl = encodeURI(`http://localhost:8080/history?year=${year}&address=${address}&startDate=${startYYYYMMDD}&endDate=${endYYYYMMDD}`)
         apiOldUrls.push(apiUrl)
     }
 
@@ -51,13 +51,15 @@ console.log(address)
                 .then((response: AxiosResponse) => {
                     const { data } = response
     console.log(`--- new url RESPONDED <<---- : ${url}`)
-                    if (data.name !== 'Error') {
+
+                    try {
                         addYear(
                             Number(getYearFromData(data)),
                             getTemperaturesFromData(data)
                         )
-                    } else {
-                        handleError(data)
+                    } catch(e: any) {
+                        console.log(e)
+                        throw new Error('there was an error trying to process the climate data')
                     }
                 })
                 .catch(handleError)
@@ -69,13 +71,15 @@ console.log(address)
                 .then((response: AxiosResponse) => {
                     const { data } = response
     console.log(`--- old url RESPONDED <<---- : ${url}`)
-                    if (data.name !== 'Error') {
+
+                    try {
                         addOldYear(
                             Number(getYearFromData(data)),
                             getTemperaturesFromData(data)
                         )
-                    } else {
-                        handleError(data)
+                    } catch(e: any) {
+                        console.log(e)
+                        throw new Error('there was an error trying to process the climate data')
                     }
                 })
                 .catch(handleError)
@@ -94,13 +98,22 @@ console.log(address)
 
     callAPI()
 
-    function handleError(error: AxiosError) {
-        console.log(error.message)
-        setApiError(true)
-/*
+    function handleError(error: any) {
+        const responseCode: number = error.response?.status || 200
+        const errorMessage: string = error.message || ''
+        let userMessage: string = ``
 
-NEXT : pass up apiError = true
-
-*/
+        if (responseCode === 422) {
+            userMessage = `the climate data for ${address} isn't available, please try another location`
+        } else if (errorMessage === 'Network Error') {
+            userMessage = `sorry, there was a network error trying to get you the information`
+        } else if (errorMessage.length > 0) {
+            console.log(error.message)
+            userMessage = `sorry, there was an error getting you the information`
+        } else {
+            userMessage = `sorry, there was an error getting you the information`
+        }
+        
+        setApiErrorMessage(userMessage)
     }
 }

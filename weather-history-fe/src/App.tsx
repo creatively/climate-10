@@ -23,7 +23,7 @@ export default function App() {
   const [ oldAveragesAcrossYears, setOldAveragesAcrossYears ] = useState<number[]>([])
   const [ yearsIncrease, setYearsIncrease] = useState<number>(0)
   const [ address, setAddress ] = useState<string>('')
-  const [ apiError, setApiError ] = useState<boolean>(false)
+  const [ apiErrorMessage, setApiErrorMessage ] = useState<string>('') 
   const [ showResultsText, setShowResultsText ] = useState<boolean>(false)
   const [ showGraph, setShowGraph ] = useState<boolean>(false)
   const [ showLoader, setShowLoader ] = useState<boolean>(false)
@@ -56,6 +56,7 @@ export default function App() {
   function onSearchBoxUpdate(chosenCityDetails: ICityDetails) {
     console.log(`--- onSearchBoxUpdate function called`)
     console.log(chosenCityDetails)
+    setApiErrorMessage('')
     clearYears()
     clearOldYears()
     setShowGraph(false)
@@ -193,11 +194,11 @@ export default function App() {
   }, [ years, oldYears])
 
   useEffect(() => {
-    if (apiError === true) {
+    if (apiErrorMessage !== '') {
       setShowLoader(false)
       setShowGraph(false)
     }
-  }, [ apiError ])
+  }, [ apiErrorMessage ])
 
 
   function doApiCalls(address: string) {
@@ -210,7 +211,7 @@ export default function App() {
       finishDateMMDD, 
       addYear, 
       addOldYear,
-      setApiError,
+      setApiErrorMessage,
       weatherParameter
     )
   }
@@ -228,6 +229,11 @@ export default function App() {
           { showResultsText ?
             <div className="results-text">+ { yearsIncrease }'C</div>
             : `` 
+          }
+
+          { apiErrorMessage !== '' 
+            ? <div className="api-error">{apiErrorMessage}</div>
+            : ``
           }
         </div>
 
@@ -335,11 +341,6 @@ export default function App() {
             <img src="https://miro.medium.com/max/400/1*em5HcTFZIQw90qIgdbYjVg.gif" alt="loading" height="200" width="260" />
           </div>
         : `` 
-      }
-
-      { apiError ?
-        <div className="api-error">Unfortunately, there's been an error trying to get any weather data</div>
-        : ``
       }
 
       </div>
