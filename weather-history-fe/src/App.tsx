@@ -54,8 +54,6 @@ export default function App() {
 
   // callback function from CustomSearchBox component
   function onSearchBoxUpdate(chosenCityDetails: ICityDetails) {
-    console.log(`--- onSearchBoxUpdate function called`)
-    console.log(chosenCityDetails)
     setApiErrorMessage('')
     clearYears()
     clearOldYears()
@@ -133,8 +131,9 @@ export default function App() {
           arrayAverages.push(average(arrayDay))
         }
       }
-      const arrayRunningAveraged: number[] = getRunningAverages(arrayAverages, runningAverageSpread)
-      setAveragesAcrossYears(arrayRunningAveraged)
+
+      const arrayMonthAverages: number[] = getMonthAveragesFromDayAverages(arrayAverages)
+      setAveragesAcrossYears(arrayMonthAverages)
     }
 
   }, [ years ])
@@ -158,11 +157,31 @@ export default function App() {
           arrayAverages.push(average(arrayDay))
         }
       }
-      const arrayRunningAveraged: number[] = getRunningAverages(arrayAverages, runningAverageSpread)
-      setOldAveragesAcrossYears(arrayRunningAveraged)
+
+      const arrayMonthAverages: number[] = getMonthAveragesFromDayAverages(arrayAverages)
+      setOldAveragesAcrossYears(arrayMonthAverages)
     }
 
   }, [ oldYears ])
+
+
+  function getMonthAveragesFromDayAverages(arrayAverages: number[]) {
+    const arrayMonthAverages = []
+    const daysInMonth = [31,28,31,30,31,30,31,31,30,31,30,31]
+    let currentDay = 0
+    for (let currentMonth=0; currentMonth<12; currentMonth++) {
+      let monthTotal = 0
+      for (let dayOfMonth=0; dayOfMonth<daysInMonth[currentMonth]; dayOfMonth++) {
+        monthTotal += arrayAverages[currentDay]
+        currentDay++
+      }
+      const monthAverage: number = Number((monthTotal / daysInMonth[currentMonth]).toFixed(1))
+      arrayMonthAverages[currentMonth] = monthAverage
+    }
+
+    return arrayMonthAverages
+  }
+
 
   useEffect(() => {
 
@@ -232,7 +251,7 @@ export default function App() {
           }
 
           { apiErrorMessage !== '' 
-            ? <div className="api-error">{apiErrorMessage}</div>
+            ? <div className="api-error">{ apiErrorMessage }</div>
             : ``
           }
         </div>
@@ -250,35 +269,9 @@ export default function App() {
               padding={{ top: 0, bottom: 0 }}
             >
 
-              {years.map((year: Year, index: number) => (
-                <VictoryLine
-                  key={`key_year_${index}`}
-                  interpolation="natural"
-                  data={year.temperatures}
-                  label={year.year.toString()}
-                  style={{
-                    data: {
-                      stroke: "#eee",
-                      strokeWidth: 1
-                    }
-                  }}
-                />
-              ))}
+              
 
-              {oldYears.map((oldYear: Year, index: number) => (
-                <VictoryLine
-                  key={`key_oldyear_${index}`}
-                  interpolation="natural"
-                  data={oldYear.temperatures}
-                  label={oldYear.year.toString()}
-                  style={{
-                    data: {
-                      stroke: "#e5e5e5",
-                      strokeWidth: 1
-                    }
-                  }}
-                />
-              ))}
+
 
               <VictoryLine
                 key={`key_averages`}
@@ -304,10 +297,10 @@ export default function App() {
               />
 
               <VictoryAxis
-                domain={[0,365]} 
+                domain={[0,11]} 
                 axisLabelComponent={<VictoryLabel dy={5} />}
                 tickLabelComponent={<VictoryLabel dy={-7} style={{fontSize: '10px'}} />}
-                tickValues={[15, 46, 74, 105, 135, 167, 197, 227, 257, 288, 319, 349]}
+                tickValues={[0,1,2,3,4,5,6,7,8,9,10,11]}
                 tickFormat={['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']}
               />
               <VictoryAxis dependentAxis
