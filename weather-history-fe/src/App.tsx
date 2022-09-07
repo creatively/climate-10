@@ -20,6 +20,8 @@ export default function App() {
   const [ axisYmin, setAxisYmin ] = useState<number>(0)
   const [ axisYmax, setAxisYmax ] = useState<number>(0)
   const [ averagesAcrossYears, setAveragesAcrossYears ] = useState<number[]>([])
+  const [ plots, setPlots ] = useState<number[]>([])
+  const [ plotsOld, setPlotsOld ] = useState<number[]>([])
   const [ oldAveragesAcrossYears, setOldAveragesAcrossYears ] = useState<number[]>([])
   const [ yearsIncrease, setYearsIncrease] = useState<number>(0)
   const [ address, setAddress ] = useState<string>('')
@@ -31,11 +33,10 @@ export default function App() {
   const weatherParameter: string = `tempmax`
   const yearsAgoStart: number = 0
   const oldYearsAgoStart: number = 10
-  const startDateMMDD: string = `01-01`
-  const finishDateMMDD: string = `12-31`
   const numberOfDaysToGet: number = 365  // ^
   const numberOfYearsToGet: number = 5
-  const runningAverageSpread: number = 20
+  const numberOfTimepointsInAYear: number = 23
+  const timepointsDayRange: number = 20 / 2
 
 
   interface ICityDetails {
@@ -45,6 +46,8 @@ export default function App() {
     flag: string,
     regionCode: string
   }
+
+  const c = (txt: any) => console.log(txt)
 
 
   // call once on first render
@@ -118,22 +121,46 @@ export default function App() {
       const arrMin: number[] = years.map(year => Math.min(...year.temperatures))
       setAxisYmin(Math.min(...arrMin) - 3)
 
-      // calculate & set the running-average temperature for x days over x years
+      // when 'year' changes, calculate & set the running-average day temperature for x days over x years
       let arrayAverages: number[] = []
       for (let daysIndex: number = 0; daysIndex < numberOfDaysToGet; daysIndex++) {
-        let arrayDay: number[] = []
+        let arrayDays: number[] = []
         for (let yearsIndex=0; yearsIndex<numberOfDaysToGet; yearsIndex++) {
           if (years[yearsIndex] && years[yearsIndex]?.temperatures[daysIndex]) {
-            arrayDay.push(years[yearsIndex]?.temperatures[daysIndex])
+            arrayDays.push(years[yearsIndex]?.temperatures[daysIndex])
           }
         }
-        if (arrayDay?.length > 0) {
-          arrayAverages.push(average(arrayDay))
+        if (arrayDays.length > 0) {
+          arrayAverages.push(average(arrayDays))
         }
       }
 
-      const arrayMonthAverages: number[] = getMonthAveragesFromDayAverages(arrayAverages)
-      setAveragesAcrossYears(arrayMonthAverages)
+      // when the array of day values is ready (arrayAverages), convert it to an array of month average values (arrayMonthAverages)
+      const monthAverages: number[] = getAveragesFromDayAverages(arrayAverages)
+      console.log(`new monthAverages .... `, monthAverages)
+
+      // when the array of month averages (arrayMonthAverages) is ready, add the month midpoints (e. Feb 1st)
+      /*
+      const januaryAverage: number = monthAverages[0]
+      const decemberAverage: number = monthAverages[monthAverages.length - 1]
+      const newYearMidpoint: number = average([decemberAverage, januaryAverage])
+      const arrayToPlot: number[] = []
+
+      monthAverages.forEach((monthAverage, index) => {
+        if (index === 0 || index === 24) {
+          const midpoint: number = average([monthAverage, monthAverages[index - 1]])
+          arrayToPlot.push(midpoint)
+          arrayToPlot.push(monthAverage)
+        } else {
+          arrayToPlot.push(newYearMidpoint)
+          arrayToPlot.push(monthAverage)
+        }
+      })
+      */
+
+
+      // when the array of array to plot (arrayToPlot) is complete, set 'plots'
+      setPlots(monthAverages)
     }
 
   }, [ years ])
@@ -158,28 +185,59 @@ export default function App() {
         }
       }
 
-      const arrayMonthAverages: number[] = getMonthAveragesFromDayAverages(arrayAverages)
+      const arrayMonthAverages: number[] = [1,1,1,1,1,1,1,1,1,1,1,1]
       setOldAveragesAcrossYears(arrayMonthAverages)
     }
 
   }, [ oldYears ])
 
 
-  function getMonthAveragesFromDayAverages(arrayAverages: number[]) {
-    const arrayMonthAverages = []
-    const daysInMonth = [31,28,31,30,31,30,31,31,30,31,30,31]
-    let currentDay = 0
-    for (let currentMonth=0; currentMonth<12; currentMonth++) {
-      let monthTotal = 0
-      for (let dayOfMonth=0; dayOfMonth<daysInMonth[currentMonth]; dayOfMonth++) {
-        monthTotal += arrayAverages[currentDay]
-        currentDay++
+  function getAveragesFromDayAverages(dayAverages: number[]) {
+    const results: number[] = []
+    const daysBetweenTimepoints: number = 30
+    const daysAroundTimepoints: number = 15
+
+    // get averageForNewYear period (dec -> jan)
+    function getAverageOverNewYear(dayAverages: number[]) {
+      let total = 0
+      for (let dayIndex=357; dayIndex<365; dayIndex++) {
+        total += dayAverages[dayIndex]
       }
-      const monthAverage: number = Number((monthTotal / daysInMonth[currentMonth]).toFixed(1))
-      arrayMonthAverages[currentMonth] = monthAverage
+      for (let dayIndex=0; dayIndex<8; dayIndex++) {
+        total += dayAverages[dayIndex]
+      }
+      return total / 16
+    }
+    const averageForNewYear: number = getAverageOverNewYear(dayAverages)
+
+    // get average for a specified range of days
+    function getAverageOfDayRange(indexFirst: number, indexLast: number, arrayAverages: number[]) {
+      let result: number = 0
+      for (let dayIndex = indexFirst; dayIndex < indexLast; dayIndex++) {
+        result += dayAverages[dayIndex]
+      }
+      return result / (indexLast - indexFirst)
     }
 
-    return arrayMonthAverages
+    // add the average for the new year period as the 1st timepoint
+    results.push(averageForNewYear)
+
+    // add the averages for each timepoint in the year
+    for (let timepointDayIndex = daysBetweenTimepoints; timepointDayIndex < 365; timepointDayIndex += daysBetweenTimepoints) {
+      if (timepointDayIndex + daysAroundTimepoints < 365) {
+        const firstDayIndex: number = Math.max(0, timepointDayIndex - timepointsDayRange)
+        const lastDayIndex: number = Math.min(365, timepointDayIndex + timepointsDayRange)
+
+        // get average of all days in the timepoint's range
+        const averageForTimepoint: number = getAverageOfDayRange(firstDayIndex, lastDayIndex, dayAverages)
+        results.push(averageForTimepoint)
+      }
+    }
+
+    // add the average for the new year period as the last timepoint
+    results.push(averageForNewYear)
+
+    return results
   }
 
 
@@ -226,14 +284,17 @@ export default function App() {
       yearsAgoStart, 
       oldYearsAgoStart, 
       numberOfYearsToGet, 
-      startDateMMDD, 
-      finishDateMMDD, 
       addYear, 
       addOldYear,
       setApiErrorMessage,
       weatherParameter
     )
   }
+
+
+  useEffect(() => {
+    console.log(`plots .... `,plots)
+  }, [ plots ])
   
 
   return (
@@ -271,12 +332,10 @@ export default function App() {
 
               
 
-
-
               <VictoryLine
                 key={`key_averages`}
                 interpolation="natural"
-                data={averagesAcrossYears}
+                data={plots}
                 style={{
                   data: {
                     stroke: "crimson",
@@ -297,11 +356,11 @@ export default function App() {
               />
 
               <VictoryAxis
-                domain={[0,11]} 
+                domain={[0,13]} 
                 axisLabelComponent={<VictoryLabel dy={5} />}
                 tickLabelComponent={<VictoryLabel dy={-7} style={{fontSize: '10px'}} />}
-                tickValues={[0,1,2,3,4,5,6,7,8,9,10,11]}
-                tickFormat={['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']}
+                tickValues={[0,1,2,3,4,5,6,7,8,9,10,11,12,13]}
+                tickFormat={['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','']}
               />
               <VictoryAxis dependentAxis
                 label={`Daily maximum temperature 'C`}

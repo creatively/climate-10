@@ -10,9 +10,7 @@ export default function APICalls(
         address: string, 
         yearsAgoStart: number,
         oldYearAgoStart: number,
-        numberOfPastYears: number, 
-        startMMDD: string, 
-        endMMDD: string, 
+        numberOfPastYears: number,  
         addYear: any, 
         addOldYear: any,
         setApiErrorMessage: any,
@@ -27,8 +25,8 @@ export default function APICalls(
     // RECENT YEARS
     for (let index=yearsAgoStart; index<(numberOfPastYears + yearsAgoStart); index++) {
         const year: number = currentYear - index - 1
-        const startYYYYMMDD: string = `${year}-${startMMDD}`
-        const endYYYYMMDD: string = `${year}-${endMMDD}`
+        const startYYYYMMDD: string = `${year}-01-01`
+        const endYYYYMMDD: string = `${year}-12-31`
         // --- expect a bug here where startDate is between Dec 16 & Dec 31, as year overlap
 
         const apiUrl: string = encodeURI(`http://localhost:8080/history?year=${year}&address=${address}&startDate=${startYYYYMMDD}&endDate=${endYYYYMMDD}`)
@@ -38,8 +36,8 @@ export default function APICalls(
     // OLDER YEARS
     for (let index=oldYearAgoStart; index<(numberOfPastYears + oldYearAgoStart); index++) {
         const year: number = currentYear - index - 1
-        const startYYYYMMDD: string = `${year}-${startMMDD}`
-        const endYYYYMMDD: string = `${year}-${endMMDD}`
+        const startYYYYMMDD: string = `${year}-01-01`
+        const endYYYYMMDD: string = `${year}-12-31`
         const apiUrl = encodeURI(`http://localhost:8080/history?year=${year}&address=${address}&startDate=${startYYYYMMDD}&endDate=${endYYYYMMDD}`)
         apiOldUrls.push(apiUrl)
     }
