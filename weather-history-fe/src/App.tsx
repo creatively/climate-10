@@ -67,6 +67,7 @@ export default function App() {
     doApiCalls(chosenCityDetails.label)
   }
 
+
   // utility function - averages numbers
   function average(array: number[]) {
     let result = 0
@@ -79,65 +80,64 @@ export default function App() {
     return result
   }
 
-  // when 'year' changes, update plots with new api-incoming 'year' data
-  useEffect(() => {
 
-    if (years.length > 0) {
+  function setAxisMinMax() {
 
-      // when 'year' changes, obtain the latest min/max values to size the graph axis
-      const arrMax: number[] = years.map(year => Math.max(...year.temperatures))
-      setAxisYmax(Math.max(...arrMax) + 3)
+    // obtain the latest min/max values to size the graph axis
+    const arrMax: number[] = years.map(year => Math.max(...year.temperatures))
+    setAxisYmax(Math.max(...arrMax) + 3)
 
-      const arrMin: number[] = years.map(year => Math.min(...year.temperatures))
-      setAxisYmin(Math.min(...arrMin) - 3)
+    const arrMin: number[] = years.map(year => Math.min(...year.temperatures))
+    setAxisYmin(Math.min(...arrMin) - 3)
+  }
 
-      // when 'year' changes, calculate & set the running-average day temperature for x days over x years
-      let arrayAverages: number[] = []
-      for (let daysIndex: number = 0; daysIndex < numberOfDaysToGet; daysIndex++) {
-        let arrayDays: number[] = []
-        for (let yearsIndex=0; yearsIndex<numberOfDaysToGet; yearsIndex++) {
-          if (years[yearsIndex] && years[yearsIndex]?.temperatures[daysIndex]) {
-            arrayDays.push(years[yearsIndex].temperatures[daysIndex])
-          }
-        }
-        if (arrayDays.length > 0) {
-          arrayAverages.push(average(arrayDays))
+
+  function getEveryDaysAverageTemperature(yearsNewOrOld: Year[]): number[] {
+    let dayAverages: number[] = []
+
+    //  loop through days of year
+    for (let daysIndex: number = 0; daysIndex < numberOfDaysToGet; daysIndex++) {
+      let days: number[] = []
+
+      // loop through years to average
+      for (let yearsIndex = 0; yearsIndex < numberOfDaysToGet; yearsIndex++) {
+        if (yearsNewOrOld[yearsIndex] && yearsNewOrOld[yearsIndex]?.temperatures[daysIndex]) {
+
+          // build an array of temperature from each year for that day 
+          days.push(yearsNewOrOld[yearsIndex].temperatures[daysIndex])
         }
       }
 
-      // when the array of day values is ready (arrayAverages), convert it to an array of month average values (arrayMonthAverages)
-      const plottableAverages: number[] = getPlottableAveragesFromDayAverages(arrayAverages)
-
-      // when the array to plot (arrayToPlot) is complete, set 'plots'
-      setPlots(plottableAverages)
+      // build an array of the average temperature for that day
+      dayAverages.push(average(days))
     }
+    return dayAverages
+  }
+
+
+  // when 'year' changes, update plots with new api-incoming 'year' data
+  useEffect(() => {
+
+    // set the axis min/max scale
+    setAxisMinMax()
+
+    // get the average temperature for every day of the yeat
+    const dayAverages: number[] = getEveryDaysAverageTemperature(years)
+
+    // when the array of day values is ready (dayAverages), convert it to an array of month average values (arrayMonthAverages)
+    const timepointAverages: number[] = getPlottableAveragesFromDayAverages(dayAverages)
+
+    // when the array to plot (timepointAverages) is complete, set 'plots'
+    setPlots(timepointAverages)
 
   }, [ years ])
 
 
-  // when oldYears changes
+  // when oldYears changes, update plots with new api-incoming 'yearOld' data
   useEffect(() => {
-
-    if (oldYears.length > 0) {
-
-      // calculate & set the running-average temperature for x days over x years
-      let arrayAverages: number[] = []
-      for (let daysIndex: number = 0; daysIndex < numberOfDaysToGet; daysIndex++) {
-        let arrayDay: number[] = []
-        for (let oldYearsIndex=0; oldYearsIndex<numberOfDaysToGet; oldYearsIndex++) {
-          if (oldYears[oldYearsIndex] && oldYears[oldYearsIndex]?.temperatures[daysIndex]) {
-            arrayDay.push(oldYears[oldYearsIndex]?.temperatures[daysIndex])
-          }
-        }
-        if (arrayDay?.length > 0) {
-          arrayAverages.push(average(arrayDay))
-        }
-      }
-
-      const arrayMonthAverages: number[] = [1,1,1,1,1,1,1,1,1,1,1,1]
-      setOldAveragesAcrossYears(arrayMonthAverages)
-    }
-
+      const dayAverages: number[] = getEveryDaysAverageTemperature(oldYears)
+      const timepointAverages: number[] = getPlottableAveragesFromDayAverages(dayAverages)
+      setPlotsOld(timepointAverages)
   }, [ oldYears ])
 
 
@@ -183,6 +183,7 @@ export default function App() {
         const averageForTimepoint: number = getAverageOfDayRange(firstDayIndex, lastDayIndex, dayAverages)
         const averageOfThisAndLastEntry = getAverageOfDayRange(firstDayIndex - midpointDaysAway, lastDayIndex - midpointDaysAway, dayAverages)
         
+        // add timepont averages to results (plots)
         results.push(averageOfThisAndLastEntry)
         results.push(averageForTimepoint)
       }
@@ -290,7 +291,7 @@ export default function App() {
                     label={year.year.toString()}
                     style={{
                       data: {
-                        stroke: "#eee",
+                        stroke: "rgba(255,100,0,0.07)",
                         strokeWidth: 1
                       }
                     }}
@@ -305,7 +306,7 @@ export default function App() {
                     label={oldYear.year.toString()}
                     style={{
                       data: {
-                        stroke: "#e5e5e5",
+                        stroke: "rgba(0,200,200,0.09)",
                         strokeWidth: 1
                       }
                     }}
@@ -339,7 +340,7 @@ export default function App() {
 
               </VictoryChart>
             </div>
-          
+
 
 
 
@@ -364,7 +365,7 @@ export default function App() {
                 <VictoryLine
                   key={`key_old_averages`}
                   interpolation="natural"
-                  data={oldAveragesAcrossYears}
+                  data={plotsOld}
                   style={{
                     data: {
                       stroke: "dodgerblue",
