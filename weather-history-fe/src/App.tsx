@@ -79,37 +79,7 @@ export default function App() {
     return result
   }
 
-  // utility function - running-average array from an array of numbers
-  function getRunningAverages(arrayOfNumbers: number[], spreadSize: number) {
-    let arrayRunningAveragedItems: number[] = []
-
-    // average-out initial items in the array before spreadSize is reached
-    for (let itemIndex: number=0; itemIndex < spreadSize; itemIndex++) { 
-      let cumulativeTotalOfCurrentNumber: number = 0
-      for (let positionIndex: number=0; positionIndex < itemIndex; positionIndex++) {
-          cumulativeTotalOfCurrentNumber += arrayOfNumbers[positionIndex]
-      }
-      const runningAveragedItem: number = Math.round(cumulativeTotalOfCurrentNumber / itemIndex)
-      arrayRunningAveragedItems.push(runningAveragedItem)
-    }
-
-    // average-out all other items
-    for (let itemIndex: number = spreadSize - 1; itemIndex < arrayOfNumbers.length; itemIndex++) { 
-      let cumulativeTotalOfCurrentNumber: number = 0
-      for (let positionIndex: number = 0; positionIndex < spreadSize; positionIndex++) {
-          const indexOfItemToAdd: number = itemIndex - positionIndex
-          cumulativeTotalOfCurrentNumber += arrayOfNumbers[indexOfItemToAdd]
-      }
-      const runningAveragedItem: number = Math.round(cumulativeTotalOfCurrentNumber / spreadSize)
-      arrayRunningAveragedItems.push(runningAveragedItem)
-    }
-
-    // return the running averages array
-    return arrayRunningAveragedItems.filter(item => item === Number(item))
-  }
-
-
-  // when year changes
+  // when 'year' changes, update plots with new api-incoming 'year' data
   useEffect(() => {
 
     if (years.length > 0) {
@@ -127,7 +97,7 @@ export default function App() {
         let arrayDays: number[] = []
         for (let yearsIndex=0; yearsIndex<numberOfDaysToGet; yearsIndex++) {
           if (years[yearsIndex] && years[yearsIndex]?.temperatures[daysIndex]) {
-            arrayDays.push(years[yearsIndex]?.temperatures[daysIndex])
+            arrayDays.push(years[yearsIndex].temperatures[daysIndex])
           }
         }
         if (arrayDays.length > 0) {
@@ -136,31 +106,10 @@ export default function App() {
       }
 
       // when the array of day values is ready (arrayAverages), convert it to an array of month average values (arrayMonthAverages)
-      const monthAverages: number[] = getAveragesFromDayAverages(arrayAverages)
-      console.log(`new monthAverages .... `, monthAverages)
+      const plottableAverages: number[] = getPlottableAveragesFromDayAverages(arrayAverages)
 
-      // when the array of month averages (arrayMonthAverages) is ready, add the month midpoints (e. Feb 1st)
-      /*
-      const januaryAverage: number = monthAverages[0]
-      const decemberAverage: number = monthAverages[monthAverages.length - 1]
-      const newYearMidpoint: number = average([decemberAverage, januaryAverage])
-      const arrayToPlot: number[] = []
-
-      monthAverages.forEach((monthAverage, index) => {
-        if (index === 0 || index === 24) {
-          const midpoint: number = average([monthAverage, monthAverages[index - 1]])
-          arrayToPlot.push(midpoint)
-          arrayToPlot.push(monthAverage)
-        } else {
-          arrayToPlot.push(newYearMidpoint)
-          arrayToPlot.push(monthAverage)
-        }
-      })
-      */
-
-
-      // when the array of array to plot (arrayToPlot) is complete, set 'plots'
-      setPlots(monthAverages)
+      // when the array to plot (arrayToPlot) is complete, set 'plots'
+      setPlots(plottableAverages)
     }
 
   }, [ years ])
@@ -192,7 +141,8 @@ export default function App() {
   }, [ oldYears ])
 
 
-  function getAveragesFromDayAverages(dayAverages: number[]) {
+  // get timepoint/plottable averages from day averages
+  function getPlottableAveragesFromDayAverages(dayAverages: number[]) {
     const results: number[] = []
     const daysBetweenTimepoints: number = 30
     const daysAroundTimepoints: number = 15
@@ -229,18 +179,24 @@ export default function App() {
         const lastDayIndex: number = Math.min(365, timepointDayIndex + timepointsDayRange)
 
         // get average of all days in the timepoint's range
+        const midpointDaysAway = 14
         const averageForTimepoint: number = getAverageOfDayRange(firstDayIndex, lastDayIndex, dayAverages)
+        const averageOfThisAndLastEntry = getAverageOfDayRange(firstDayIndex - midpointDaysAway, lastDayIndex - midpointDaysAway, dayAverages)
+        
+        results.push(averageOfThisAndLastEntry)
         results.push(averageForTimepoint)
       }
     }
 
     // add the average for the new year period as the last timepoint
     results.push(averageForNewYear)
+    results.push(averageForNewYear)
 
     return results
   }
 
-
+  
+  // when either years or oldYears changes
   useEffect(() => {
 
     const newTempsTotal: number = 
@@ -292,11 +248,6 @@ export default function App() {
   }
 
 
-  useEffect(() => {
-    console.log(`plots .... `,plots)
-  }, [ plots ])
-  
-
   return (
 
     <div className="App">
@@ -324,67 +275,134 @@ export default function App() {
             <div className="old-years">2006-2011</div><div className="key-years-text">compared with</div><div className="new-years">2016-2021</div>
           </div>
 
-          <div className="chart-container">
+          <div className="charts-container">
+            <div className="chart-container-days">
 
-            <VictoryChart
-              padding={{ top: 0, bottom: 0 }}
-            >
+              <VictoryChart
+                padding={{ top: 0, bottom: 0 }}
+              >           
 
-              
+                {years.map((year: Year, index: number) => (
+                  <VictoryLine
+                    key={`key_days_${index}`}
+                    interpolation="natural"
+                    data={year.temperatures}
+                    label={year.year.toString()}
+                    style={{
+                      data: {
+                        stroke: "#eee",
+                        strokeWidth: 1
+                      }
+                    }}
+                  />
+                ))}
 
-              <VictoryLine
-                key={`key_averages`}
-                interpolation="natural"
-                data={plots}
-                style={{
-                  data: {
-                    stroke: "crimson",
-                    strokeWidth: 1
-                  }
-                }}
-              />
-              <VictoryLine
-                key={`key_old_averages`}
-                interpolation="natural"
-                data={oldAveragesAcrossYears}
-                style={{
-                  data: {
-                    stroke: "dodgerblue",
-                    strokeWidth: 1
-                  }
-                }}
-              />
+                {oldYears.map((oldYear: Year, index: number) => (
+                  <VictoryLine
+                    key={`key_days_old_${index}`}
+                    interpolation="natural"
+                    data={oldYear.temperatures}
+                    label={oldYear.year.toString()}
+                    style={{
+                      data: {
+                        stroke: "#e5e5e5",
+                        strokeWidth: 1
+                      }
+                    }}
+                  />
+                ))}
 
-              <VictoryAxis
-                domain={[0,13]} 
-                axisLabelComponent={<VictoryLabel dy={5} />}
-                tickLabelComponent={<VictoryLabel dy={-7} style={{fontSize: '10px'}} />}
-                tickValues={[0,1,2,3,4,5,6,7,8,9,10,11,12,13]}
-                tickFormat={['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','']}
-              />
-              <VictoryAxis dependentAxis
-                label={`Daily maximum temperature 'C`}
-                tickFormat={[-30,-25,-20,-15,-10,-5,0,5,10,15,20,25,30,35,40,45,50]}
-                domain={[axisYmin,axisYmax]}
-                axisLabelComponent={<VictoryLabel dy={-11} />}
-                tickLabelComponent={<VictoryLabel dy={0} style={{fontSize: '10px'}} />}
-                style={{
-                  axisLabel: {
-                    fontSize: 12,
-                    padding: 30
-                  },
-                  grid: {
-                    stroke: "#bbb",
-                    strokeWidth: 1
-                  }
-                }}
-              />
+                <VictoryAxis
+                  domain={[0,13]} 
+                  axisLabelComponent={<VictoryLabel dy={5} />}
+                  tickLabelComponent={<VictoryLabel dy={-7} style={{fontSize: '10px'}} />}
+                  tickValues={[]}
+                  tickFormat={['']}
+                />
+                <VictoryAxis dependentAxis
+                  label={``}
+                  tickFormat={[0]}
+                  domain={[axisYmin,axisYmax]}
+                  axisLabelComponent={<VictoryLabel dy={-11} />}
+                  tickLabelComponent={<VictoryLabel dy={0} style={{fontSize: '10px'}} />}
+                  style={{
+                    axisLabel: {
+                      fontSize: 12,
+                      padding: 30
+                    },
+                    grid: {
+                      stroke: "#bbb",
+                      strokeWidth: 0
+                    }
+                  }}
+                />
 
-            </VictoryChart>
+              </VictoryChart>
+            </div>
+          
 
+
+
+
+
+            <div className="chart-container-averages">
+              <VictoryChart
+                padding={{ top: 0, bottom: 0 }}
+              >  
+
+                <VictoryLine
+                  key={`key_averages`}
+                  interpolation="natural"
+                  data={plots}
+                  style={{
+                    data: {
+                      stroke: "crimson",
+                      strokeWidth: 1
+                    }
+                  }}
+                />
+                <VictoryLine
+                  key={`key_old_averages`}
+                  interpolation="natural"
+                  data={oldAveragesAcrossYears}
+                  style={{
+                    data: {
+                      stroke: "dodgerblue",
+                      strokeWidth: 1
+                    }
+                  }}
+                />
+
+                <VictoryAxis
+                  domain={[0,24]} 
+                  axisLabelComponent={<VictoryLabel dy={5} />}
+                  tickLabelComponent={<VictoryLabel dy={-7} style={{fontSize: '10px'}} />}
+                  tickValues={[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24]}
+                  tickFormat={['','Jan','','Feb','','Mar','','Apr','','May','','Jun','','Jul','','Aug','','Sep','','Oct','','Nov','','Dec','']}
+                />
+                <VictoryAxis dependentAxis
+                  label={`Daily maximum temperature 'C`}
+                  tickFormat={[-30,-25,-20,-15,-10,-5,0,5,10,15,20,25,30,35,40,45,50]}
+                  domain={[axisYmin,axisYmax]}
+                  axisLabelComponent={<VictoryLabel dy={-11} />}
+                  tickLabelComponent={<VictoryLabel dy={0} style={{fontSize: '10px'}} />}
+                  style={{
+                    axisLabel: {
+                      fontSize: 12,
+                      padding: 30
+                    },
+                    grid: {
+                      stroke: "#bbb",
+                      strokeWidth: 1
+                    }
+                  }}
+                />
+
+              </VictoryChart>
+
+            </div>
           </div>
         </>
-
         : ``
       }
       

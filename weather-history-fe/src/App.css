@@ -90,11 +90,25 @@ h2 {
     color: crimson;
   }
 
-  .chart-container {
+  .charts-container {
+    position: relative;
     margin: 0 auto;
-    height:400px;
-    width:800px;
+    height: 400px;
   }
+
+    .chart-container-days {
+      position: absolute;
+      margin: 0 auto;
+      height:100%;
+      width:100%;
+    }
+
+    .chart-container-averages {
+      position: absolute;
+      margin: 0 auto;
+      height:100%;
+      width:100%;
+    }
 
   .results-text {
     font-size: 28px;
@@ -118,8 +132,7 @@ h2 {
 }
 
 .VictoryContainer {
-  height:500px;
-  width:900px;
+  width:400px;
 }
 
 
