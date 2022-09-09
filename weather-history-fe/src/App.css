@@ -60,13 +60,14 @@ h2 {
 }
 
 .key-years {
+  position: relative;
   font-weight: 700;
-  margin: 10px 0 12px;
+  margin: 10px 0 0;
+  min-height: 52px;
 }
 
   .old-years,
-  .new-years,
-  .key-years-text {
+  .new-years {
     display:inline-block;
     padding: 0 4px;
   }
@@ -78,16 +79,14 @@ h2 {
 
   .old-years {
     color: dodgerblue;
-  }
-
-  .key-years-text {
-    margin: 2px 0;
-    color: #555;
-    line-height: 12px;
+    width: 200px;
+    padding: 3px;
   }
 
   .new-years {
     color: crimson;
+    width: 200px;
+    padding: 3px;
   }
 
   .charts-container {
@@ -96,18 +95,40 @@ h2 {
     height: 400px;
   }
 
+  .latest-year-loaded {
+    margin: 0 auto;
+    top: 100px;
+    font-weight: bold;
+    font-size: 240px;
+    color: rgba(100, 100, 100, 0.05);
+  }
+      @keyframes fadeaway { 
+        0% {
+          opacity: 0.05;
+        }
+        100% {
+          opacity: 0;
+        }
+      }
+
+      .fadeaway-animation {
+        animation: fadeaway 0.7s;
+      }
+
     .chart-container-days {
       position: absolute;
       margin: 0 auto;
-      height:100%;
-      width:100%;
+      top: 0;
+      height: 100%;
+      width: 100%;
     }
 
     .chart-container-averages {
       position: absolute;
       margin: 0 auto;
-      height:100%;
-      width:100%;
+      top: 0;
+      height: 100%;
+      width: 100%;
     }
 
   .results-text {

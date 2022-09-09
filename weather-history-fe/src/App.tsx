@@ -29,6 +29,12 @@ export default function App() {
   const [ showResultsText, setShowResultsText ] = useState<boolean>(false)
   const [ showGraph, setShowGraph ] = useState<boolean>(false)
   const [ showLoader, setShowLoader ] = useState<boolean>(false)
+  const [ yearsWithDataReceived, setYearsWithDataReceived ] = useState<number[]>([])
+  const [ oldYearsWithDataReceived, setOldYearsWithDataReceived ] = useState<number[]>([])
+  const [ latestYearLoaded, setLatestYearLoaded ] = useState<number>(0)
+  let [opacity, setOpacity] = useState(0.8);
+  let [shouldTransition, setShouldTransition] = useState(true);
+
 
   const weatherParameter: string = `tempmax`
   const yearsAgoStart: number = 0
@@ -50,25 +56,28 @@ export default function App() {
   const c = (txt: any) => console.log(txt)
 
 
-  // call once on first render
+  // when this component forst loads, load the font
   useEffectOnce(() => {
     WebFont.load({google: {families: ['Monserrat','Volkhov']}});
   })
 
-  // callback function from CustomSearchBox component
+  // when CustomSearchBox has selected a location, clear up anything previous, and trigger API Calls
   function onSearchBoxUpdate(chosenCityDetails: ICityDetails) {
     setApiErrorMessage('')
     clearYears()
     clearOldYears()
+    setYearsWithDataReceived([])
+    setOldYearsWithDataReceived([])
     setShowGraph(false)
     setShowResultsText(false)
     setAddress(chosenCityDetails.label)
     setShowLoader(true)
+
     doApiCalls(chosenCityDetails.label)
   }
 
 
-  // utility function - averages numbers
+  // when an array is passed into this utility function, return an average of the numbers
   function average(array: number[]) {
     let result = 0
     if (array.length > 0) {
@@ -80,7 +89,7 @@ export default function App() {
     return result
   }
 
-
+  // when this function is called, calculate & set the graph's axis ranges 
   function setAxisMinMax() {
 
     // obtain the latest min/max values to size the graph axis
@@ -91,7 +100,7 @@ export default function App() {
     setAxisYmin(Math.min(...arrMin) - 3)
   }
 
-
+  // when an array of 5 years X 365 day temperatures is passed into this function, return an array of average temperatures for 365 days
   function getEveryDaysAverageTemperature(yearsNewOrOld: Year[]): number[] {
     let dayAverages: number[] = []
 
@@ -114,34 +123,63 @@ export default function App() {
     return dayAverages
   }
 
+  // when the number of the latest year's data is passed into this function, reset the 'fadeaway' animation of numbers
+  function addAndFadeAwayLatestYear(latestYear: number) {
+    setLatestYearLoaded(latestYear)
+  }
 
-  // when 'year' changes, update plots with new api-incoming 'year' data
+  // when any year of 'years' data (2017-2021) is received, update the graph plots
   useEffect(() => {
+
+    // add latest year data loaded to the list (yearsWithDataReceived) of such years
+    const latestYear: number = years[years.length - 1]?.year
+
+console.log(latestYear)
+
+    setYearsWithDataReceived([...yearsWithDataReceived, latestYear])
+    addAndFadeAwayLatestYear(latestYear)
+    
+    setShouldTransition(false)
+    setOpacity(0.8)
 
     // set the axis min/max scale
     setAxisMinMax()
 
-    // get the average temperature for every day of the yeat
+    // get the average temperature for every day of the year
     const dayAverages: number[] = getEveryDaysAverageTemperature(years)
 
-    // when the array of day values is ready (dayAverages), convert it to an array of month average values (arrayMonthAverages)
+    // when the array of day values is ready (dayAverages), convert it to an array of broader averages across points in time (timepointAverages)
     const timepointAverages: number[] = getPlottableAveragesFromDayAverages(dayAverages)
 
-    // when the array to plot (timepointAverages) is complete, set 'plots'
+    // when the array to plot is ready (timepointAverages), set 'plots'
     setPlots(timepointAverages)
 
   }, [ years ])
 
 
-  // when oldYears changes, update plots with new api-incoming 'yearOld' data
+  // when any year of 'oldYears' data (2007-2011) is received, update the graph plots
   useEffect(() => {
+      const latestYear: number = oldYears[oldYears.length - 1]?.year
+      setOldYearsWithDataReceived([...oldYearsWithDataReceived, latestYear])
+      setLatestYearLoaded(latestYear)
+
+      setShouldTransition(false)
+      setOpacity(0.8)
+
       const dayAverages: number[] = getEveryDaysAverageTemperature(oldYears)
       const timepointAverages: number[] = getPlottableAveragesFromDayAverages(dayAverages)
       setPlotsOld(timepointAverages)
   }, [ oldYears ])
 
+  useEffect(() => {
+    if (opacity === 0.8) {
+      setShouldTransition(true)
+      setOpacity(0)
+    }
+  }, [ opacity ])
 
-  // get timepoint/plottable averages from day averages
+
+  // when day aveages have been calculated ('getEveryDaysAverageTemperature'), get timepoint/plottable averages from day averages
   function getPlottableAveragesFromDayAverages(dayAverages: number[]) {
     const results: number[] = []
     const daysBetweenTimepoints: number = 30
@@ -197,7 +235,7 @@ export default function App() {
   }
 
   
-  // when either years or oldYears changes
+  // when either years or oldYears changes, calculate & show the overall temperature change figure + the graph
   useEffect(() => {
 
     const newTempsTotal: number = 
@@ -217,7 +255,7 @@ export default function App() {
     const increase: number = Number(((newTempsTotal - oldTempsTotal) / 365).toFixed(1))
     setYearsIncrease(increase)
 
-    if (years.length > 0 && oldYears.length > 0) {
+    if (years.length > 0 || oldYears.length > 0) {
       setShowGraph(true)
       setShowLoader(false)
     }
@@ -227,6 +265,7 @@ export default function App() {
 
   }, [ years, oldYears])
 
+  // when an API error occurs, hide any loader and graph
   useEffect(() => {
     if (apiErrorMessage !== '') {
       setShowLoader(false)
@@ -234,7 +273,7 @@ export default function App() {
     }
   }, [ apiErrorMessage ])
 
-
+  // when this component initialises, call the API for data
   function doApiCalls(address: string) {
     APICalls(
       address, 
@@ -273,10 +312,19 @@ export default function App() {
 
         <>
           <div className="key-years">
-            <div className="old-years">2006-2011</div><div className="key-years-text">compared with</div><div className="new-years">2016-2021</div>
+            <div className="old-years">{ oldYearsWithDataReceived.join(' ') }</div>
+            <div className="new-years">{ yearsWithDataReceived.join(' ') }</div>
           </div>
 
           <div className="charts-container">
+
+            <div className="latest-year-loaded"
+              style={{
+                transition: shouldTransition ? "all 0.7s" : "",
+                opacity: `${opacity}`
+              }}
+            >{ latestYearLoaded }</div>
+
             <div className="chart-container-days">
 
               <VictoryChart
@@ -291,7 +339,7 @@ export default function App() {
                     label={year.year.toString()}
                     style={{
                       data: {
-                        stroke: "rgba(255,100,0,0.07)",
+                        stroke: "rgba(200,200,200,0.1)",
                         strokeWidth: 1
                       }
                     }}
@@ -306,7 +354,7 @@ export default function App() {
                     label={oldYear.year.toString()}
                     style={{
                       data: {
-                        stroke: "rgba(0,200,200,0.09)",
+                        stroke: "rgba(200,200,200,0.1)",
                         strokeWidth: 1
                       }
                     }}

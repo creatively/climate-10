@@ -2,8 +2,9 @@ import { SetStateAction, useEffect } from 'react'
 import { useStore } from './weather-history-store'
 import { DateTime } from 'luxon'
 import { Year, Years, YearsState } from './interfaces'
-import axios, { AxiosError, AxiosResponse } from 'axios'
+import axios, { AxiosError, AxiosPromise, AxiosResponse } from 'axios'
 import { CatchClause } from 'typescript'
+import { url } from 'inspector'
 
 
 export default function APICalls(
@@ -22,18 +23,16 @@ export default function APICalls(
     const apiOldUrls: string[] = []
 
 
-    // RECENT YEARS
+    // when this component begins, construct 'apiUrls' - a url to get data for each 'new' (2017-2021) year
     for (let index=yearsAgoStart; index<(numberOfPastYears + yearsAgoStart); index++) {
         const year: number = currentYear - index - 1
         const startYYYYMMDD: string = `${year}-01-01`
         const endYYYYMMDD: string = `${year}-12-31`
-        // --- expect a bug here where startDate is between Dec 16 & Dec 31, as year overlap
-
         const apiUrl: string = encodeURI(`http://localhost:8080/history?year=${year}&address=${address}&startDate=${startYYYYMMDD}&endDate=${endYYYYMMDD}`)
         apiUrls.push(apiUrl)
     }
 
-    // OLDER YEARS
+    // when this component begins, construct 'apiOldUrls' - a url to get data for each 'old' (2007-2011) year
     for (let index=oldYearAgoStart; index<(numberOfPastYears + oldYearAgoStart); index++) {
         const year: number = currentYear - index - 1
         const startYYYYMMDD: string = `${year}-01-01`
@@ -42,67 +41,61 @@ export default function APICalls(
         apiOldUrls.push(apiUrl)
     }
 
-    function callAPI() {
-        apiUrls.forEach((url) => {
-    console.log(`--- new url REQUESTED ---->> : ${url}`)
-            axios.get((url))
-                .then((response: AxiosResponse) => {
-                    const { data } = response
-    console.log(`--- new url RESPONDED <<---- : ${url}`)
+    // when this function is called, call the API for all historical weather data required
+    function callAPI() {     
 
-                    try {
-                        addYear(
-                            Number(getYearFromData(data)),
-                            getTemperaturesFromData(data)
-                        )
-                    } catch(e: any) {
-                        console.log(e)
-                        throw new Error('there was an error trying to process the climate data')
-                    }
-                })
-                .catch(handleError)
-        })
+        function sendUrls(urls: string[], callbackAddYear: any) {
+            try {
+                Promise.all(
+                    urls.map((url: any) => {
+                        return axios.get(url)
+                    })
+                ).then((datas) => {
+                    datas.forEach((data, index) => {
+                        setTimeout(() => {
+                            callbackAddYear(
+                                Number(getYearFromData(data.data)),
+                                getTemperaturesFromData(data.data)
+                            )
+                        }, index * (1000 + Math.random()*1000))
+                    })
+                    
+                }).catch(handleError)
+            } catch(e: any) {
+                console.log(e)
+                throw new Error('there was an error trying to process the climate data')
+            }
+        }
 
-        apiOldUrls.forEach((url) => {
-    console.log(`--- old url REQUESTED ---->> : ${url}`)
-            axios.get((url))
-                .then((response: AxiosResponse) => {
-                    const { data } = response
-    console.log(`--- old url RESPONDED <<---- : ${url}`)
-
-                    try {
-                        addOldYear(
-                            Number(getYearFromData(data)),
-                            getTemperaturesFromData(data)
-                        )
-                    } catch(e: any) {
-                        console.log(e)
-                        throw new Error('there was an error trying to process the climate data')
-                    }
-                })
-                .catch(handleError)
-        })
+        sendUrls(apiUrls, addYear)
+        setTimeout(() => {
+            sendUrls(apiOldUrls, addOldYear)
+        }, 9000)
     }
 
+    // when passing a year's data is passed into this function, return what year the data represents
     function getYearFromData(data: any) {
         const year = Number(data.days[0].datetime.substring(0,4))
         return year
     }
 
+    // when a year's data is passed into this function, return jusr an array of numbers of temprature values
     function getTemperaturesFromData(data: any) {
         const temperatues = data.days.map((day: any) => day[weatherParameter])
         return temperatues
     }
 
+    // when this component begins, call the API
     callAPI()
 
+    // when calling the API, if an error occurs, handle it
     function handleError(error: any) {
         const responseCode: number = error.response?.status || 200
         const errorMessage: string = error.message || ''
         let userMessage: string = ``
 
         if (responseCode === 422) {
-            userMessage = `the climate data for ${address} isn't available, please try another location`
+            userMessage = `the past weather data for ${address} isn't available, please try another location`
         } else if (errorMessage === 'Network Error') {
             userMessage = `sorry, there was a network error trying to get you the information`
         } else if (errorMessage.length > 0) {
