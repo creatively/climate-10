@@ -61,19 +61,14 @@ h2 {
 
 .key-years {
   position: relative;
-  font-weight: 700;
+  font-weight: 400;
   margin: 10px 0 0;
-  min-height: 52px;
 }
 
   .old-years,
   .new-years {
     display:inline-block;
     padding: 0 4px;
-  }
-
-  .old-years,
-  .new-years {
     font-size: 22px;
   }
 
@@ -95,13 +90,21 @@ h2 {
     height: 400px;
   }
 
-  .latest-year-loaded {
-    margin: 0 auto;
-    top: 100px;
-    font-weight: bold;
-    font-size: 240px;
-    color: rgba(100, 100, 100, 0.05);
-  }
+    .results-bg-text {
+      position:relative;
+      margin: 0 auto;
+      font-weight: bold;
+      font-size: 160px;
+      color: rgba(100, 100, 100, 0.1);
+    }
+
+    .latest-year-loaded {
+      margin: 0 auto;
+      top: 100px;
+      font-weight: bold;
+      font-size: 240px;
+      color: rgba(100, 100, 100, 0.05);
+    }
       @keyframes fadeaway { 
         0% {
           opacity: 0.05;

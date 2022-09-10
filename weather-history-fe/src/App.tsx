@@ -123,22 +123,14 @@ export default function App() {
     return dayAverages
   }
 
-  // when the number of the latest year's data is passed into this function, reset the 'fadeaway' animation of numbers
-  function addAndFadeAwayLatestYear(latestYear: number) {
-    setLatestYearLoaded(latestYear)
-  }
-
   // when any year of 'years' data (2017-2021) is received, update the graph plots
   useEffect(() => {
 
     // add latest year data loaded to the list (yearsWithDataReceived) of such years
     const latestYear: number = years[years.length - 1]?.year
 
-console.log(latestYear)
-
-    setYearsWithDataReceived([...yearsWithDataReceived, latestYear])
-    addAndFadeAwayLatestYear(latestYear)
-    
+    //setYearsWithDataReceived([...yearsWithDataReceived, latestYear])
+    setLatestYearLoaded(latestYear)
     setShouldTransition(false)
     setOpacity(0.8)
 
@@ -160,7 +152,7 @@ console.log(latestYear)
   // when any year of 'oldYears' data (2007-2011) is received, update the graph plots
   useEffect(() => {
       const latestYear: number = oldYears[oldYears.length - 1]?.year
-      setOldYearsWithDataReceived([...oldYearsWithDataReceived, latestYear])
+      //setOldYearsWithDataReceived([...oldYearsWithDataReceived, latestYear])
       setLatestYearLoaded(latestYear)
 
       setShouldTransition(false)
@@ -171,8 +163,9 @@ console.log(latestYear)
       setPlotsOld(timepointAverages)
   }, [ oldYears ])
 
+  // when the opacity of the background year texts changes, and not all year data loaded yet, fade the text out
   useEffect(() => {
-    if (opacity === 0.8) {
+    if (opacity === 0.8 && (yearsWithDataReceived.length < 5 || setOldYearsWithDataReceived.length < 5))  {
       setShouldTransition(true)
       setOpacity(0)
     }
@@ -254,6 +247,7 @@ console.log(latestYear)
 
     const increase: number = Number(((newTempsTotal - oldTempsTotal) / 365).toFixed(1))
     setYearsIncrease(increase)
+    
 
     if (years.length > 0 || oldYears.length > 0) {
       setShowGraph(true)
@@ -261,6 +255,7 @@ console.log(latestYear)
     }
     if (years.length === numberOfYearsToGet && oldYears.length === numberOfYearsToGet) {
       setShowResultsText(true)
+
     }
 
   }, [ years, oldYears])
@@ -311,19 +306,27 @@ console.log(latestYear)
         { showGraph ? 
 
         <>
+
+          { showResultsText ?
+            <div className="results-bg-text">{ yearsIncrease >= 0 ? `+`:``}{ yearsIncrease }'C</div>
+            : `` 
+          }
+
           <div className="key-years">
-            <div className="old-years">{ oldYearsWithDataReceived.join(' ') }</div>
-            <div className="new-years">{ yearsWithDataReceived.join(' ') }</div>
+            <div className="old-years">------- 2007 to 2011</div>
+            <div className="new-years">------- 2017 to 2011</div>
           </div>
 
           <div className="charts-container">
 
-            <div className="latest-year-loaded"
-              style={{
-                transition: shouldTransition ? "all 0.7s" : "",
-                opacity: `${opacity}`
-              }}
-            >{ latestYearLoaded }</div>
+            { latestYearLoaded > 0 ?
+              <div className="latest-year-loaded"
+                style={{
+                  transition: shouldTransition ? "all 0.7s" : "",
+                  opacity: `${opacity}`
+                }}
+              >{ latestYearLoaded }</div>
+            : ``}
 
             <div className="chart-container-days">
 
