@@ -84,6 +84,14 @@ h2 {
     padding: 3px;
   }
 
+  .old-years-key-line {
+    color: dodgerblue;
+  }
+
+  .new-years-key-line {
+    color: crimson;
+  }
+
   .charts-container {
     position: relative;
     margin: 0 auto;
@@ -95,7 +103,7 @@ h2 {
       margin: 0 auto;
       font-weight: bold;
       font-size: 160px;
-      color: rgba(100, 100, 100, 0.1);
+      color: rgba(100, 100, 100, 0.25);
     }
 
     .latest-year-loaded {

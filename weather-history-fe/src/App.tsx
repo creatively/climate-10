@@ -293,7 +293,7 @@ export default function App() {
         <div className="search-box-container">
           <SearchBoxCustom onSearchBoxUpdate={onSearchBoxUpdate} />
           { showResultsText ?
-            <div className="results-text">+ { yearsIncrease }'C</div>
+            <div className="results-text">{ yearsIncrease >= 0 ? `+`:``}{ yearsIncrease }'C</div>
             : `` 
           }
 
@@ -307,14 +307,9 @@ export default function App() {
 
         <>
 
-          { showResultsText ?
-            <div className="results-bg-text">{ yearsIncrease >= 0 ? `+`:``}{ yearsIncrease }'C</div>
-            : `` 
-          }
-
           <div className="key-years">
-            <div className="old-years">------- 2007 to 2011</div>
-            <div className="new-years">------- 2017 to 2011</div>
+            <div className="old-years"><span className="old-years-key-line">-------</span> 2007 to 2011</div>
+            <div className="new-years"><span className="new-years-key-line">-------</span> 2017 to 2021</div>
           </div>
 
           <div className="charts-container">
@@ -454,6 +449,11 @@ export default function App() {
 
             </div>
           </div>
+
+          { showResultsText ?
+            <div className="results-bg-text">{ yearsIncrease >= 0 ? `+`:``}{ yearsIncrease }'C</div>
+            : `` 
+          }
         </>
         : ``
       }
