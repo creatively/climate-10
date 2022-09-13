@@ -1,7 +1,6 @@
 .App {
   text-align: center;
   height:600px;
-  /*font-family:'Volkhov', arial;*/
   font-family: 'Monserrat', arial;
   font-weight:400;
 }
@@ -10,12 +9,22 @@
   margin: 20px 0 0;
 }
 
-/* ----- styles for local implementation of <CustomSearchBox> -- start */
+h2 {
+  font-weight: 700;
+  margin: 8px 0 14px;
+  background: #555;
+  padding: 8px;
+  color: white;
+}
+
+/* ----- styles for local implementation of <CustomSearchBox> -- */
+
 .search-box-container {
+  position: relative;
   max-width: 510px;
   margin: 0 auto;
   border: 0;
-  position: relative;
+  padding: 0 14px;
 }
   .search-box-custom {
     border-radius: 24px;
@@ -49,17 +58,18 @@
     border-left: 1px solid #ddd;
     border-right: 1px solid #ddd;
   }
-/* ----- styles for local implementation of <CustomSearchBox> -- end */
 
-h2 {
-  font-weight: 700;
-  margin: 8px 0 14px;
-  background: #555;
-  padding: 8px;
-  color: white;
+/* ----- styles for local implementation of <CustomSearchBox> ---- */
+
+/* ----- error text ----- */
+.api-error {
+  color: darkred;
+  margin-top: 12px;
 }
 
-.key-years {
+/* ----- key ----- */
+
+.key {
   position: relative;
   font-weight: 400;
   margin: 10px 0 0;
@@ -68,29 +78,19 @@ h2 {
   .old-years,
   .new-years {
     display:inline-block;
-    padding: 0 4px;
+    padding: 3px;
     font-size: 22px;
   }
 
-  .old-years {
-    color: dodgerblue;
-    width: 200px;
-    padding: 3px;
-  }
-
-  .new-years {
-    color: crimson;
-    width: 200px;
-    padding: 3px;
-  }
-
-  .old-years-key-line {
+  .old-years, .old-years-key-line {
     color: dodgerblue;
   }
 
-  .new-years-key-line {
+  .new-years, .new-years-key-line {
     color: crimson;
   }
+
+  /* ----- charts area ----- */
 
   .charts-container {
     position: relative;
@@ -98,13 +98,25 @@ h2 {
     height: 400px;
   }
 
-    .results-bg-text {
-      position:relative;
-      margin: 0 auto;
-      font-weight: bold;
-      font-size: 160px;
-      color: rgba(100, 100, 100, 0.25);
+    /* -----  result figure [+ - number] on Search Box ----- */
+
+    .results-text {
+      font-size: 28px;
+      font-family: arial;
+      font-weight: 700;
+      width: 120px;
+      margin: 6px auto 0;
+      background: darkred;
+      color: white;
+      padding: 6px 0;
+      border-radius: 0 20px 20px 0;
+      position: absolute;
+      top: -5px;
+      right: 0;
+      z-index:2;
     }
+
+    /* ----- flashing years loading ----- */
 
     .latest-year-loaded {
       margin: 0 auto;
@@ -126,50 +138,41 @@ h2 {
         animation: fadeaway 0.7s;
       }
 
-    .chart-container-days {
-      position: absolute;
-      margin: 0 auto;
-      top: 0;
-      height: 100%;
-      width: 100%;
-    }
+      /* ----- graph line - grey day spikes ----- */
 
-    .chart-container-averages {
-      position: absolute;
-      margin: 0 auto;
-      top: 0;
-      height: 100%;
-      width: 100%;
-    }
+      .chart-container-days {
+        position: absolute;
+        margin: 0 auto;
+        top: 0;
+        height: 100%;
+        width: 100%;
+      }
 
-  .results-text {
-    font-size: 28px;
-    font-family: arial;
-    font-weight: 700;
-    width: 120px;
-    margin: 6px auto 0;
-    background: darkred;
-    color: white;
-    padding: 6px 0;
-    border-radius: 0 20px 20px 0;
-    position: absolute;
-    top: -5px;
-    right: 0;
-    z-index:2;
-  }
+        .VictoryContainer {
+          width:400px;
+        }
 
-.api-error {
-  color: darkred;
-  margin-top: 12px;
-}
+      /* ----- graph line - average lines ----- */
 
-.VictoryContainer {
-  width:400px;
-}
+      .chart-container-averages {
+        position: absolute;
+        margin: 0 auto;
+        top: 0;
+        height: 100%;
+        width: 100%;
+      }
 
+        .VictoryContainer {
+          width:400px;
+        }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
+    
+    /* -----  result figure [+ - number] - large text ----- */
+
+      .results-bg-text {
+        position:relative;
+        margin: 0 auto;
+        font-weight: bold;
+        font-size: 180px;
+        color: rgba(200, 200, 200, 0.65);
+      }

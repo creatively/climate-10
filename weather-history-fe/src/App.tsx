@@ -287,10 +287,11 @@ export default function App() {
 
     <div className="App">
       <div className="main">
-
+        <header className="heading-container">
         <h2>Find how much your local climate has changed in 10 years</h2>
+        </header>
 
-        <div className="search-box-container">
+        <section className="search-box-container">
           <SearchBoxCustom onSearchBoxUpdate={onSearchBoxUpdate} />
           { showResultsText ?
             <div className="results-text">{ yearsIncrease >= 0 ? `+`:``}{ yearsIncrease }'C</div>
@@ -301,18 +302,18 @@ export default function App() {
             ? <div className="api-error">{ apiErrorMessage }</div>
             : ``
           }
-        </div>
+        </section>
 
         { showGraph ? 
 
         <>
 
-          <div className="key-years">
+          <section className="key">
             <div className="old-years"><span className="old-years-key-line">-------</span> 2007 to 2011</div>
             <div className="new-years"><span className="new-years-key-line">-------</span> 2017 to 2021</div>
-          </div>
+          </section>
 
-          <div className="charts-container">
+          <section className="charts-container">
 
             { latestYearLoaded > 0 ?
               <div className="latest-year-loaded"
@@ -337,7 +338,7 @@ export default function App() {
                     label={year.year.toString()}
                     style={{
                       data: {
-                        stroke: "rgba(200,200,200,0.1)",
+                        stroke: "rgba(200,200,200,0.2)",
                         strokeWidth: 1
                       }
                     }}
@@ -352,7 +353,7 @@ export default function App() {
                     label={oldYear.year.toString()}
                     style={{
                       data: {
-                        stroke: "rgba(200,200,200,0.1)",
+                        stroke: "rgba(200,200,200,0.2)",
                         strokeWidth: 1
                       }
                     }}
@@ -386,10 +387,6 @@ export default function App() {
 
               </VictoryChart>
             </div>
-
-
-
-
 
 
             <div className="chart-container-averages">
@@ -448,7 +445,7 @@ export default function App() {
               </VictoryChart>
 
             </div>
-          </div>
+          </section>
 
           { showResultsText ?
             <div className="results-bg-text">{ yearsIncrease >= 0 ? `+`:``}{ yearsIncrease }'C</div>
