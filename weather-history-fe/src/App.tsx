@@ -293,14 +293,17 @@ export default function App() {
 
         <section className="search-box-container">
           <SearchBoxCustom onSearchBoxUpdate={onSearchBoxUpdate} />
-          { showResultsText ?
-            <div className="results-text">{ yearsIncrease >= 0 ? `+`:``}{ yearsIncrease }'C</div>
-            : `` 
-          }
 
           { apiErrorMessage !== '' 
             ? <div className="api-error">{ apiErrorMessage }</div>
             : ``
+          }
+        </section>
+
+        <section className="results-text-container">
+          { showResultsText ?
+              <div className="results-text">{ yearsIncrease >= 0 ? `+ `:``}{ yearsIncrease }'C in the last 10 years</div>
+              : `` 
           }
         </section>
 
@@ -309,8 +312,8 @@ export default function App() {
         <>
 
           <section className="key">
-            <div className="old-years"><span className="old-years-key-line">-------</span> 2007 to 2011</div>
-            <div className="new-years"><span className="new-years-key-line">-------</span> 2017 to 2021</div>
+            <div className="old-years"><span className="old-years-key-line"><i className="line">______ </i> 2007 to 2011</span></div>
+            <div className="new-years"><span className="new-years-key-line"><i className="line">______ </i> 2017 to 2021</span></div>
           </section>
 
           <section className="charts-container">

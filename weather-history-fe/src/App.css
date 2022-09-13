@@ -1,34 +1,43 @@
 .App {
   text-align: center;
-  height:600px;
   font-family: 'Monserrat', arial;
-  font-weight:400;
 }
 
-.main {
-  margin: 20px 0 0;
-}
+  .heading-container {
+    position: relative;
+    height: 280px;
+    background: rgb(131,58,180);
+    background: linear-gradient(90deg, rgba(131,58,180,1) 0%, rgba(253,29,29,1) 62%, rgba(252,176,69,1) 100%);
+  }
 
-h2 {
-  font-weight: 700;
-  margin: 8px 0 14px;
-  background: #555;
-  padding: 8px;
-  color: white;
-}
-
-/* ----- styles for local implementation of <CustomSearchBox> -- */
+    h2 {
+      position: relative;
+      top: 94px;
+      width: 18em;
+      font-weight: 700;
+      font-size: 2.2em;
+      line-height: 44px;
+      margin: 0 auto;
+      color: white;
+    }
 
 .search-box-container {
   position: relative;
-  max-width: 510px;
+  height: 140px;
+  width: 100%;
   margin: 0 auto;
   border: 0;
-  padding: 0 14px;
+  background-color: #1c354c;
 }
+
+  /* ----- styles for local implementation of <CustomSearchBox> -- */
+  
   .search-box-custom {
     border-radius: 24px;
-    border: 2px solid #555;
+    max-width: 520px;
+    margin: auto;
+    top: 45px;
+    background-color: white;
   }
 
     .inputbox {
@@ -36,9 +45,7 @@ h2 {
       padding-right:20px;
       text-align:left;
       font-family:'Monserrat', arial;
-      font-size:1.4em;
-      border-radius:2px;
-      height:42px;
+      font-size: 1.8em;
       background: transparent;
     }
 
@@ -48,23 +55,44 @@ h2 {
       }
 
       .inputbox-loader-image {
-        top:9px;
+        top:14px;
       }
 
-  .city-options--visible {
-    margin-top: 0;
+  ul.city-options--visible {
+    top: 64px;
+    margin-top: -15px;
     list-style-type: none;
-    padding-left: 22px;
+    margin-left:10px;
+    padding-left: 12px;
     border-left: 1px solid #ddd;
     border-right: 1px solid #ddd;
   }
 
-/* ----- styles for local implementation of <CustomSearchBox> ---- */
+  /* ----- end of - styles for local implementation of <CustomSearchBox> ---- */
+
+  /* -----  result figure [+ - number] by Search Box ----- */
+
+.results-text-container {
+  font-size: 26px;
+  font-family: arial;
+  font-weight: 700;
+  width: 100%;
+  height: 70px;
+  line-height: 70px;
+  background-color: #064f74;
+}
+
+.results-text {
+  margin: 0 auto;
+  color: white;
+}
 
 /* ----- error text ----- */
 .api-error {
-  color: darkred;
-  margin-top: 12px;
+  color: white;
+  font-size: 22px;
+  top: 97px;
+  position: relative;
 }
 
 /* ----- key ----- */
@@ -72,14 +100,15 @@ h2 {
 .key {
   position: relative;
   font-weight: 400;
-  margin: 10px 0 0;
+  font-size: 28px;
+  padding-top: 24px;
+  padding-bottom: 10px;
 }
 
   .old-years,
   .new-years {
-    display:inline-block;
-    padding: 3px;
-    font-size: 22px;
+    display: inline-block;
+    padding: 0 26px;
   }
 
   .old-years, .old-years-key-line {
@@ -90,6 +119,10 @@ h2 {
     color: crimson;
   }
 
+    .line {
+      top: -8px;
+    }
+
   /* ----- charts area ----- */
 
   .charts-container {
@@ -97,24 +130,6 @@ h2 {
     margin: 0 auto;
     height: 400px;
   }
-
-    /* -----  result figure [+ - number] on Search Box ----- */
-
-    .results-text {
-      font-size: 28px;
-      font-family: arial;
-      font-weight: 700;
-      width: 120px;
-      margin: 6px auto 0;
-      background: darkred;
-      color: white;
-      padding: 6px 0;
-      border-radius: 0 20px 20px 0;
-      position: absolute;
-      top: -5px;
-      right: 0;
-      z-index:2;
-    }
 
     /* ----- flashing years loading ----- */
 
