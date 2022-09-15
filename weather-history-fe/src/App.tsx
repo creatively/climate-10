@@ -8,7 +8,6 @@ import APICalls from './APICalls'
 import SearchBoxCustom from './SearchBoxCustom'
 import './App.css'
 import WebFont from 'webfontloader'
-import { stringify } from 'querystring';
 
 
 export default function App() {
@@ -20,10 +19,10 @@ export default function App() {
   const [ axisYmin, setAxisYmin ] = useState<number>(0)
   const [ axisYmax, setAxisYmax ] = useState<number>(0)
   const [ averagesAcrossYears, setAveragesAcrossYears ] = useState<number[]>([])
+  const [ oldAveragesAcrossYears, setOldAveragesAcrossYears ] = useState<number[]>([])
   const [ plots, setPlots ] = useState<number[]>([])
   const [ plotsOld, setPlotsOld ] = useState<number[]>([])
-  const [ oldAveragesAcrossYears, setOldAveragesAcrossYears ] = useState<number[]>([])
-  const [ yearsIncrease, setYearsIncrease] = useState<number>(0)
+  const [ yearsIncrease, setYearsIncrease] = useState<number>(0.00)
   const [ address, setAddress ] = useState<string>('')
   const [ apiErrorMessage, setApiErrorMessage ] = useState<string>('') 
   const [ showResultsText, setShowResultsText ] = useState<boolean>(false)
@@ -32,9 +31,8 @@ export default function App() {
   const [ yearsWithDataReceived, setYearsWithDataReceived ] = useState<number[]>([])
   const [ oldYearsWithDataReceived, setOldYearsWithDataReceived ] = useState<number[]>([])
   const [ latestYearLoaded, setLatestYearLoaded ] = useState<number>(0)
-  let [opacity, setOpacity] = useState(0.8);
-  let [shouldTransition, setShouldTransition] = useState(true);
-
+  let [ opacity, setOpacity ] = useState(0.8);
+  let [ shouldTransition, setShouldTransition ] = useState(true);
 
   const weatherParameter: string = `tempmax`
   const yearsAgoStart: number = 0
@@ -43,7 +41,6 @@ export default function App() {
   const numberOfYearsToGet: number = 5
   const numberOfTimepointsInAYear: number = 23
   const timepointsDayRange: number = 20 / 2
-
 
   interface ICityDetails {
     label: string,
@@ -247,7 +244,6 @@ export default function App() {
 
     const increase: number = Number(((newTempsTotal - oldTempsTotal) / 365).toFixed(1))
     setYearsIncrease(increase)
-    
 
     if (years.length > 0 || oldYears.length > 0) {
       setShowGraph(true)
@@ -255,7 +251,6 @@ export default function App() {
     }
     if (years.length === numberOfYearsToGet && oldYears.length === numberOfYearsToGet) {
       setShowResultsText(true)
-
     }
 
   }, [ years, oldYears])
@@ -288,7 +283,7 @@ export default function App() {
     <div className="App">
       <div className="main">
         <header className="heading-container">
-        <h2>Find how much your local climate has changed in 10 years</h2>
+          <h2>Find how much your local climate has changed in 10 years</h2>
         </header>
 
         <section className="search-box-container">
@@ -312,20 +307,26 @@ export default function App() {
         <>
 
           <section className="key">
-            <div className="old-years"><span className="old-years-key-line"><i className="line">______ </i> 2007 to 2011</span></div>
-            <div className="new-years"><span className="new-years-key-line"><i className="line">______ </i> 2017 to 2021</span></div>
+            <div className="key__old-years">2007 to 2011</div>
+            <div className="key__new-years">2017 to 2021</div>
           </section>
 
           <section className="charts-container">
 
-            { latestYearLoaded > 0 ?
-              <div className="latest-year-loaded"
-                style={{
-                  transition: shouldTransition ? "all 0.7s" : "",
-                  opacity: `${opacity}`
-                }}
-              >{ latestYearLoaded }</div>
-            : ``}
+            { 
+              latestYearLoaded > 0 &&  !showResultsText ?
+                <div className="latest-year-loaded"
+                  style={{
+                    transition: shouldTransition ? "all 0.7s" : "",
+                    opacity: `${opacity}`
+                  }}
+                >{ latestYearLoaded }</div>
+              : 
+                showResultsText ?
+                  <div className="results-bg-text">{ yearsIncrease >= 0 ? `+`:``}{ yearsIncrease }'C</div>
+              : 
+                ``
+            }
 
             <div className="chart-container-days">
 
@@ -450,10 +451,6 @@ export default function App() {
             </div>
           </section>
 
-          { showResultsText ?
-            <div className="results-bg-text">{ yearsIncrease >= 0 ? `+`:``}{ yearsIncrease }'C</div>
-            : `` 
-          }
         </>
         : ``
       }

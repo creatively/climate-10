@@ -101,27 +101,25 @@
   position: relative;
   font-weight: 400;
   font-size: 28px;
-  padding-top: 24px;
-  padding-bottom: 10px;
+  padding-top: 20px;
 }
 
-  .old-years,
-  .new-years {
+  .key__old-years,
+  .key__new-years {
     display: inline-block;
-    padding: 0 26px;
+    margin: 0 30px;
+    padding-bottom: 14px; 
   }
 
-  .old-years, .old-years-key-line {
+  .key__old-years {
     color: dodgerblue;
+    border-bottom: 2px solid dodgerblue
   }
 
-  .new-years, .new-years-key-line {
+  .key__new-years {
     color: crimson;
+    border-bottom: 2px solid crimson;
   }
-
-    .line {
-      top: -8px;
-    }
 
   /* ----- charts area ----- */
 
@@ -129,6 +127,7 @@
     position: relative;
     margin: 0 auto;
     height: 400px;
+    margin-bottom: 60px;
   }
 
     /* ----- flashing years loading ----- */
@@ -140,18 +139,6 @@
       font-size: 240px;
       color: rgba(100, 100, 100, 0.05);
     }
-      @keyframes fadeaway { 
-        0% {
-          opacity: 0.05;
-        }
-        100% {
-          opacity: 0;
-        }
-      }
-
-      .fadeaway-animation {
-        animation: fadeaway 0.7s;
-      }
 
       /* ----- graph line - grey day spikes ----- */
 
@@ -187,7 +174,9 @@
       .results-bg-text {
         position:relative;
         margin: 0 auto;
+        padding-top: 60px;
         font-weight: bold;
         font-size: 180px;
         color: rgba(200, 200, 200, 0.65);
       }
+
