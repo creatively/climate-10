@@ -5,6 +5,7 @@ import { Year, Years, YearsState } from './interfaces'
 import axios, { AxiosError, AxiosPromise, AxiosResponse } from 'axios'
 import { CatchClause } from 'typescript'
 import { url } from 'inspector'
+import dotenv from 'dotenv'
 
 
 export default function APICalls(
@@ -21,6 +22,7 @@ export default function APICalls(
     const currentYear = DateTime.now().year
     const apiUrls: string[] = []
     const apiOldUrls: string[] = []
+    dotenv.config()
 
 
     // when this component begins, construct 'apiUrls' - a url to get data for each 'new' (2017-2021) year
@@ -28,7 +30,7 @@ export default function APICalls(
         const year: number = currentYear - index - 1
         const startYYYYMMDD: string = `${year}-01-01`
         const endYYYYMMDD: string = `${year}-12-31`
-        const apiUrl: string = encodeURI(`http://localhost:8080/history?year=${year}&address=${address}&startDate=${startYYYYMMDD}&endDate=${endYYYYMMDD}`)
+        const apiUrl: string = encodeURI(`${process.env.BACKEND_DOMAIN}/history?year=${year}&address=${address}&startDate=${startYYYYMMDD}&endDate=${endYYYYMMDD}`)
         apiUrls.push(apiUrl)
     }
 
@@ -37,7 +39,7 @@ export default function APICalls(
         const year: number = currentYear - index - 1
         const startYYYYMMDD: string = `${year}-01-01`
         const endYYYYMMDD: string = `${year}-12-31`
-        const apiUrl = encodeURI(`http://localhost:8080/history?year=${year}&address=${address}&startDate=${startYYYYMMDD}&endDate=${endYYYYMMDD}`)
+        const apiUrl = encodeURI(`${process.env.BACKEND_DOMAIN}/history?year=${year}&address=${address}&startDate=${startYYYYMMDD}&endDate=${endYYYYMMDD}`)
         apiOldUrls.push(apiUrl)
     }
 
