@@ -5,7 +5,6 @@ import { Year, Years, YearsState } from './interfaces'
 import axios, { AxiosError, AxiosPromise, AxiosResponse } from 'axios'
 import { CatchClause } from 'typescript'
 import { url } from 'inspector'
-import dotenv from 'dotenv'
 
 
 export default function APICalls(
@@ -22,7 +21,6 @@ export default function APICalls(
     const currentYear = DateTime.now().year
     const apiUrls: string[] = []
     const apiOldUrls: string[] = []
-    dotenv.config()
 
 
     // when this component begins, construct 'apiUrls' - a url to get data for each 'new' (2017-2021) year
