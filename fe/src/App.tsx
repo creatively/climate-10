@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { useEffectOnce } from './others-hooks/useEffectOnce'
 import { useStore } from './weather-history-store'
 import { VictoryChart, VictoryAxis, VictoryBar, VictoryTooltip, VictoryLabel, VictoryLine } from 'victory'
 import { DateTime } from 'luxon'
@@ -53,10 +52,10 @@ export default function App() {
   const c = (txt: any) => console.log(txt)
 
 
-  // when this component forst loads, load the font
-  useEffectOnce(() => {
+  // when this component first loads, load the font
+  useEffect(() => {
     WebFont.load({google: {families: ['Monserrat','Volkhov']}});
-  })
+  }, [])
 
   // when CustomSearchBox has selected a location, clear up anything previous, and trigger API Calls
   function onSearchBoxUpdate(chosenCityDetails: ICityDetails) {

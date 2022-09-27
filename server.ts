@@ -1,9 +1,12 @@
 import express, { Request, Response } from 'express'
 import cors from 'cors'
 import axios, { AxiosError, AxiosResponse } from 'axios'
+import path from 'path'
+import dotenv from 'dotenv'
 
 const app = express();
-const port: number | string = process.env.PORT || 8080;
+dotenv.config()
+
 
 app.use(cors({
     credentials: true,
@@ -14,8 +17,11 @@ app.use(cors({
     ]
 }))
 
+
+
 app.get('/history', (req: Request, res: Response) => {
-console.log(`--- BE called with : ${req.url}`)
+
+    console.log(`--- BE called with : ${req.url}`)
 
     const address: any = req.query.address
     const startDate: any = req.query.startDate
@@ -40,7 +46,18 @@ console.log(`--- BE called with : ${req.url}`)
 })
 
 
+
+if (process.env.PROD) {
+    app.use(express.static(path.join(__dirname, './fe/public')));
+    app.get('*', (req: Request, res: Response) => {
+        res.sendFile(path.join(__dirname, './fe/public/index.html'))
+    })
+}
+
+
+
 // start server
+const port: number | string = process.env.PORT || 8080;
 app.listen( port, () => {
     console.log( `BE server started at http://localhost:${ port }` );
 } );

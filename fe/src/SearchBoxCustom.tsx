@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { useDebounce } from 'use-debounce';
-import { useEffectOnce } from './others-hooks/useEffectOnce';
 import './search-box-custom.css'
 
 interface ICityDetails {
@@ -52,9 +51,9 @@ export default function SearchBoxCustom({ onSearchBoxUpdate }: ISearchBoxProps) 
 
 
     // when this component mounts, focus on the inputbox
-    useEffectOnce(() => {
+    useEffect(() => {
         inputBoxRef.current.focus()
-    })
+    }, [])
 
     // when a user's keyboard navigates to a city, change it's highlight state 
     useEffect(() => {
