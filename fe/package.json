@@ -31,7 +31,7 @@
     "zustand": "^4.0.0"
   },
   "scripts": {
-    "start": "tsc ./src/server.ts --esModuleInterop"
+    "start": "tsc ./src/index.tsx --esModuleInterop"
   },
   "eslintConfig": {
     "extends": [
