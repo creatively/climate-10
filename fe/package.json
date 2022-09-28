@@ -31,10 +31,13 @@
     "zustand": "^4.0.0"
   },
   "scripts": {
+    "start": "tsc ./src/server.ts --esModuleInterop"
+    /*
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
+    */
   },
   "eslintConfig": {
     "extends": [

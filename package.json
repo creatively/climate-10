@@ -7,7 +7,7 @@
     "start": "PROD=true tsc ./server.ts",
     "dev": "nodemon ./server.ts",
     "test": "test",
-    "postinstall": "cd ./fe && npm run build && tsc index.tsx && npm start",
+    "postinstall": "cd ./fe && npm start",
     "build": "tsc server.ts --esModuleInterop"
   },
   "author": "",
