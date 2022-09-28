@@ -7,10 +7,10 @@ import reportWebVitals from './reportWebVitals';
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
-root.render(
-  <React.StrictMode>
+root.render(<>Hi from index.tsx 1
+  <React.StrictMode>Hi from index.tsx 2
     <App />
-  </React.StrictMode>
+  </React.StrictMode></>
 );
 
 // If you want to start measuring performance in your app, pass a function
