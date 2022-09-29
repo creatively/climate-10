@@ -4,10 +4,9 @@
   "description": "app showing a graph of several years of previous temperature for a given location and day/month range",
   "main": "y",
   "scripts": {
-    "start": "PROD=true tsc ./server.ts",
+    "start": "tsc server.ts --esModuleInterop && cd ./fe && npm run build && tsc && cd ../ && node server.js",
     "dev": "nodemon ./server.ts",
     "test": "test",
-    "postinstall": "cd ./fe && npm start",
     "build": "tsc server.ts --esModuleInterop"
   },
   "author": "",

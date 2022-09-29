@@ -31,7 +31,10 @@
     "zustand": "^4.0.0"
   },
   "scripts": {
-    "start": "npm i && tsc ./src/index.tsx --esModuleInterop --jsx react"
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": [

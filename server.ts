@@ -47,17 +47,17 @@ app.get('/history', (req: Request, res: Response) => {
 
 
 
-if (process.env.PROD) {
-    app.use(express.static(path.join(__dirname, './fe/public')));
-    app.get('*', (req: Request, res: Response) => {
-        res.sendFile(path.join(__dirname, './fe/public/index.html'))
-    })
-}
+
+app.use(express.static(path.join(__dirname, './fe/build')));
+app.get('*', (req: Request, res: Response) => {
+    res.sendFile(path.join(__dirname, './fe/build/index.html'))
+})
+
 
 
 
 // start server
 const port: number | string = process.env.PORT || 8080;
 app.listen( port, () => {
-    console.log( `BE server started at http://localhost:${ port }` );
+    console.log( `BE server started on port : ${ port }` );
 } );
