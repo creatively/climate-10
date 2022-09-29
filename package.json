@@ -4,7 +4,7 @@
   "description": "app showing a graph of several years of previous temperature for a given location and day/month range",
   "main": "y",
   "scripts": {
-    "start": "tsc server.ts --esModuleInterop && cd ./fe && tsc && npm run build && cd ../ && node server.js",
+    "start": "tsc server.ts --esModuleInterop && cd ./fe && npm run build && tsc && cd ../ && node server.js",
     "dev": "nodemon ./server.ts",
     "test": "test",
     "build": "tsc server.ts --esModuleInterop"
