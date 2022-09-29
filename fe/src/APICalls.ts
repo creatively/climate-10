@@ -28,7 +28,7 @@ export default function APICalls(
         const year: number = currentYear - index - 1
         const startYYYYMMDD: string = `${year}-01-01`
         const endYYYYMMDD: string = `${year}-12-31`
-        const apiUrl: string = encodeURI(`${process.env.BACKEND_DOMAIN}/history?year=${year}&address=${address}&startDate=${startYYYYMMDD}&endDate=${endYYYYMMDD}`)
+        const apiUrl: string = encodeURI(`${process.env.REACT_APP_BACKEND_DOMAIN}/history?year=${year}&address=${address}&startDate=${startYYYYMMDD}&endDate=${endYYYYMMDD}`)
         apiUrls.push(apiUrl)
     }
 
@@ -40,6 +40,7 @@ export default function APICalls(
         const apiUrl = encodeURI(`${process.env.REACT_APP_BACKEND_DOMAIN}/history?year=${year}&address=${address}&startDate=${startYYYYMMDD}&endDate=${endYYYYMMDD}`)
         apiOldUrls.push(apiUrl)
     }
+
 
     // when this function is called, call the API for all historical weather data required
     function callAPI() {     
