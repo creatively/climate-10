@@ -4,10 +4,14 @@
   "description": "app showing a graph of several years of previous temperature for a given location and day/month range",
   "main": "y",
   "scripts": {
-    "start": "tsc server.ts --esModuleInterop && cd ./fe && npm i && npm run build && tsc && cd ../ && node server.js",
+    "start-old": "tsc server.ts --esModuleInterop && cd ./fe && npm i && npm run build && tsc && cd ../ && node server.js",
+    "start": "tsc server.ts --esModuleInterop && node server.js",
     "dev": "nodemon ./server.ts",
-    "test": "test",
-    "build": "tsc server.ts --esModuleInterop"
+    "build": "tsc server.ts --esModuleInterop",
+    "fe-install": "cd ./fe npm install",
+    "fe-build": "cd ./fe npm run build",
+    "fe-compile-ts": "cd ./fe tsc",
+    "heroku-postbuild": "npm run fe-install && npm run fe-build && npm run fe-compile-ts"
   },
   "author": "",
   "license": "ISC",
