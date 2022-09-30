@@ -14,7 +14,7 @@ app.use(cors({
         'http://localhost:8080',
         'http://localhost:3000',
         'https://weather.visualcrossing.com',
-        'http://geodb-free-service.wirefreethought.com/',
+        'https://geodb-free-service.wirefreethought.com/',
         'https://climate-10.herokuapp.com/',
         'https://climate-10.com/'
     ]
