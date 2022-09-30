@@ -81,7 +81,7 @@ export default function SearchBoxCustom({ onSearchBoxUpdate }: ISearchBoxProps) 
         if (lettersReadyForCityApiCall.length > 2) {
             (async function(): Promise<ICityDetails[]> {
                 try {
-                    const response = await fetch(
+                    const response = await fetch( 
                         `http://geodb-free-service.wirefreethought.com/v1/geo/cities?minPopulation=40000&namePrefix=${lettersReadyForCityApiCall}&hateoasMode=false&limit=${maxNumberOfOptions}&offset=0&sort=name`
                     )
                     const data = await response.json();
