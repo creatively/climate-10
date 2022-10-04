@@ -28,7 +28,7 @@ export default function APICalls(
         const year: number = currentYear - index - 1
         const startYYYYMMDD: string = `${year}-01-01`
         const endYYYYMMDD: string = `${year}-12-31`
-        const apiUrl: string = encodeURI(`${process.env.BACKEND_DOMAIN}/history?year=${year}&address=${address}&startDate=${startYYYYMMDD}&endDate=${endYYYYMMDD}`)
+        const apiUrl: string = encodeURI(`${process.env.BACKEND_DOMAIN}/history?year=${year}&startDate=${startYYYYMMDD}&endDate=${endYYYYMMDD}`)
         apiUrls.push(apiUrl)
     }
 
@@ -37,7 +37,7 @@ export default function APICalls(
         const year: number = currentYear - index - 1
         const startYYYYMMDD: string = `${year}-01-01`
         const endYYYYMMDD: string = `${year}-12-31`
-        const apiUrl = encodeURI(`${process.env.REACT_APP_BACKEND_DOMAIN}/history?year=${year}&address=${address}&startDate=${startYYYYMMDD}&endDate=${endYYYYMMDD}`)
+        const apiUrl = encodeURI(`${process.env.REACT_APP_BACKEND_DOMAIN}/history?year=${year}&startDate=${startYYYYMMDD}&endDate=${endYYYYMMDD}`)
         apiOldUrls.push(apiUrl)
     }
 
@@ -51,6 +51,7 @@ export default function APICalls(
                         return axios.get(url)
                     })
                 ).then((datas) => {
+console.log(`--- -- --- response in APICalls = `, datas)
                     datas.forEach((data, index) => {
                         setTimeout(() => {
                             callbackAddYear(
@@ -75,7 +76,9 @@ export default function APICalls(
 
     // when passing a year's data is passed into this function, return what year the data represents
     function getYearFromData(data: any) {
-        const year = Number(data.days[0].datetime.substring(0,4))
+        const datetimeEpoch: number = Number(data.days[0].datetimeEpoch)
+        const date: Date = new Date(datetimeEpoch)
+        const year: number = date.getFullYear()
         return year
     }
 
