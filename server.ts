@@ -28,6 +28,8 @@ app.get('/history', (req: Request, res: Response) => {
     const endDate: any = req.query.endDate
     const apiUrl: string = encodeURI(`https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${address}/${startDate}/${endDate}?unitGroup=uk&key=ZG6RTP56DLKZJ8LWJCLVK4RM7&contentType=json`);
 
+    console.log(`--- ^ apiUrl = ${apiUrl}`);
+
     (async () => {
         await axios(apiUrl)
             .then((response: AxiosResponse) => {
