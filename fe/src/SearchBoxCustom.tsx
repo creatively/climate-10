@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react'
-import { useDebounce } from 'use-debounce';
+import { useDebounce } from 'use-debounce'
 import './search-box-custom.css'
+import axios, { AxiosError, AxiosResponse } from 'axios'
+
 
 interface ICityDetails {
     label: string,
@@ -44,6 +46,7 @@ export default function SearchBoxCustom({ onSearchBoxUpdate }: ISearchBoxProps) 
     ])
 
     // variables
+    const thisDomain: string =  `${window.location.origin}` //`https://localhost:8080/`
     const maxNumberOfOptions = 7
     const imageIconLoader = 'https://media.giphy.com/media/sSgvbe1m3n93G/giphy.gif'
     const imageIconTick = `https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Yes_Check_Circle.svg/240px-Yes_Check_Circle.svg.png`
@@ -79,33 +82,37 @@ export default function SearchBoxCustom({ onSearchBoxUpdate }: ISearchBoxProps) 
     // when 3+ letters of a city have been typed in inputbox, make an api call to autocomplete a list of cities
     useEffect(() => {
         if (lettersReadyForCityApiCall.length > 2) {
-            (async function(): Promise<ICityDetails[]> {
-                try {
-                    const response = await fetch( 
-                        `https://geodb-free-service.wirefreethought.com/v1/geo/cities?minPopulation=100000&namePrefix=${lettersReadyForCityApiCall}&hateoasMode=false&limit=${maxNumberOfOptions}&offset=0&sort=name`
-                    )
-                    const data = await response.json();
-                    return data.data.map((cityOption: any) => {
+            const apiUrl: string = encodeURI(`${thisDomain}/cities-list?letters=${lettersReadyForCityApiCall}`);
+console.log(apiUrl)
+
+            axios.get(apiUrl)
+                .then((response: AxiosResponse ) => {
+                    const cityDetails: ICityDetails[] = response.data
+                    console.log(cityDetails)
+                    
+                    return cityDetails.map((cityOption: any) => {
+                        console.log(`    `, cityOption)
+
                         return {
-                            label: cityOption.name,
-                            lat: cityOption.latitude,
-                            lon: cityOption.longitude,
-                            flag: `https://countryflagsapi.com/png/${cityOption.countryCode}`,
-                            regionCode: cityOption.regionCode
+                            label: `Cardiff`,
+                            lat: 51.3,
+                            lon: 1.3,
+                            flag: `https://countryflagsapi.com/png/uk`,
+                            regionCode: `WAL`
                         }
                     })
-                } catch(error: any) {
+                })
+                .then((citiesData: any) => {
+                    setShowApiCallLoaderImage(false);
+                    setOptionsVisible(true)
+                    setCitiesList(citiesData)
+                })
+                .catch((error: AxiosError ) => {
                     console.log(error)
                     setErrorMessage(`Unfortunately, there's been a problem getting the list of cities`)
                     return []
-                }
-            })()
-            .then((resultsArray) => {
-                setShowApiCallLoaderImage(false);
-                setOptionsVisible(true)
-                setCitiesList(resultsArray)
-            })
-        }
+                })
+            }
     }, [ lettersReadyForCityApiCall ])
 
     // when an API call has got a city's latitude & longitude, then call the parent component's callback function
@@ -176,9 +183,11 @@ export default function SearchBoxCustom({ onSearchBoxUpdate }: ISearchBoxProps) 
         }
     }
 
+
     // render the component
     return (
         <div className="search-box-custom" ref={searchBoxRef}>
+
             <input className="inputbox"
                 title={'city searchbox'}
                 ref={inputBoxRef} 
@@ -233,6 +242,7 @@ export default function SearchBoxCustom({ onSearchBoxUpdate }: ISearchBoxProps) 
                 }
             </ul>
             <p className="error-message" ref={errorMessageElement}>{errorMessage}</p>
+
         </div>
     )
 }

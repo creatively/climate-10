@@ -69,7 +69,7 @@ export default function App() {
     setAddress(chosenCityDetails.label)
     setShowLoader(true)
 
-    doApiCalls(chosenCityDetails.label)
+    doApiCalls(chosenCityDetails.label, chosenCityDetails.lat, chosenCityDetails.lon)
   }
 
 
@@ -227,19 +227,25 @@ export default function App() {
   // when either years or oldYears changes, calculate & show the overall temperature change figure + the graph
   useEffect(() => {
 
-    const newTempsTotal: number = 
+    let newTempsTotal: number = 99
+    if (years.length > 0) {
+      newTempsTotal =
       average(years.map((year) => {
         return year.temperatures.reduce((dayTemperatureSoFar: number, nextDayTemperature: number) => {
           return dayTemperatureSoFar + nextDayTemperature
         })
       }))
+    }
 
-    const oldTempsTotal: number = 
+    let oldTempsTotal: number = 99
+    if (oldYears.length > 0) {
+      oldTempsTotal =
       average(oldYears.map((year) => {
         return year.temperatures.reduce((dayTemperatureSoFar: number, nextDayTemperature: number) => {
           return dayTemperatureSoFar + nextDayTemperature
         })
       }))
+    }
 
     const increase: number = Number(((newTempsTotal - oldTempsTotal) / 365).toFixed(1))
     setYearsIncrease(increase)
@@ -263,9 +269,11 @@ export default function App() {
   }, [ apiErrorMessage ])
 
   // when this component initialises, call the API for data
-  function doApiCalls(address: string) {
+  function doApiCalls(address: string, lat: string, lon: string) {
     APICalls(
-      address, 
+      address,
+      lat,
+      lon,
       yearsAgoStart, 
       oldYearsAgoStart, 
       numberOfYearsToGet, 
