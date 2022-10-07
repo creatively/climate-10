@@ -92,7 +92,6 @@ console.log(apiUrl)
                     
                     return cityDetails.map((cityOption: any) => {
                         console.log(`    `, cityOption)
-
                         return {
                             label: `Cardiff`,
                             lat: 51.3,

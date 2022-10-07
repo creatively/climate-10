@@ -43,6 +43,7 @@ export default function APICalls(
         apiOldUrls.push(apiUrl)
     }
 
+
     // when this function is called, call the API for all historical weather data required
     function callAPI() {     
 
