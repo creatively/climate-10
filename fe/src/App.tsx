@@ -49,9 +49,6 @@ export default function App() {
     regionCode: string
   }
 
-  const c = (txt: any) => console.log(txt)
-
-
   // when this component first loads, load the font
   useEffect(() => {
     WebFont.load({google: {families: ['Monserrat','Volkhov']}});

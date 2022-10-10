@@ -49,21 +49,17 @@ export default function APICalls(
 
         function sendUrls(urls: string[], callbackAddYear: any) {
             urls.forEach((url: string) =>  {
-                console.log(`weather url = `, url)
+
                 axios.get(url)
                     .then((response: any) => {
                         const data: any = response.data
                         const year: number = Number(data[0].datetime.substring(0, 4))
-                        console.log(`>>>>>>>>>>>>> ${year}`)
-                        //data.forEach((days: any, index: number) => {
-
-                            //setTimeout(() => {
+                            setTimeout(() => {
                                 callbackAddYear(
                                     year,
                                     getTemperaturesFromData(data)
                                 )
-                            //}, index * (1000 + Math.random()*1000))
-                        //})
+                            }, 1 * (1000 + Math.random()*3000))
                     })
                     .catch((error: any) => {
                         console.log(error)

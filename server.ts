@@ -34,12 +34,7 @@ app.use(cors({
 app.get('/cities-list', (req: Request, res: Response) => {
 
     const letters = req.query.letters
-    //const url: string = `${req.protocol}://geodb-free-service.wirefreethought.com/v1/geo/cities?minPopulation=100000&namePrefix=${letters}&hateoasMode=false&limit=7&offset=0&sort=name`;       
-
-const url: string = `http://geodb-free-service.wirefreethought.com/v1/geo/cities?minPopulation=100000&namePrefix=London&hateoasMode=false&limit=7&offset=0&sort=name`
-
-    console.log(`--- BE /cities-list/ called with letters : ${letters}`)
-    console.log(`--- ${url}`);
+    const url: string = `${req.protocol}://geodb-free-service.wirefreethought.com/v1/geo/cities?minPopulation=100000&namePrefix=${letters}&hateoasMode=false&limit=7&offset=0&sort=name`;
 
     (async function(): Promise<void> {
         await axios.get(url)
@@ -58,31 +53,22 @@ const url: string = `http://geodb-free-service.wirefreethought.com/v1/geo/cities
 app.get('/history', (req: Request, res: Response) => {
 
     console.log(`--- /history/`)
-
     console.log(`--- BE called with : ${req.url}`)
 
     const lat: any = req.query.lat
     const lon: any = req.query.lon
     const startDate: any = req.query.startDate
     const endDate: any = req.query.endDate
-
-    //const apiUrl: string = encodeURI(`${req.protocol}://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${lat},${lon}/${startDate}/${endDate}?unitGroup=uk&elements=name%2C%2CresolvedAddress%2Ctemp%2CdatetimeEpoch&include=days%2Cobs&key=ZG6RTP56DLKZJ8LWJCLVK4RM7&contentType=json`)
     const apiUrl: string = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${lat},${lon}/${startDate}/${endDate}?unitGroup=uk&elements=name%2Caddress%2CresolvedAddress%2Ctempmax%2Cdatetime&include=days%2Cobs&key=ZG6RTP56DLKZJ8LWJCLVK4RM7&options=preview&contentType=json`
-
-    console.log(apiUrl)
-    console.log(`--- ^-- : apiUrl = `);
-
 
     axios(apiUrl)
         .then((response: AxiosResponse) => {
-            console.log(111111111)
             const data = response.data
             const days = data.days
-            console.log(200)
-            res.status(200).send(days)
+            res.status(200)
+                .send(days)
         })
         .catch((error: AxiosError) => {
-            console.log(2222222)
             const apisErrorMessage: any = error.response?.data
             if (apisErrorMessage?.includes(`Invalid location found`)) {
                 console.log(`--- invalid location --- lat,lon = ${lat}, ${lon}`)

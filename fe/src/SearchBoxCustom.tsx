@@ -65,39 +65,22 @@ export default function SearchBoxCustom({ onSearchBoxUpdate }: ISearchBoxProps) 
         }
     }, [ cityOptionWithFocus ])
 
-    // when a city is chosen, set an appropriate inputbox icon & update inputbox's Letter-Casing
-    useEffect(() => {
-        (inputLetters === chosenCity?.label)
-            ? setShowGreenTick(true)
-            : setShowGreenTick(false)
-        
-        if (inputLetters.length > 2 && inputLetters !== chosenCity?.label) {
-            setShowApiCallLoaderImage(true);
-        }
-        if (inputLetters.charAt(0) !== inputLetters.charAt(0).toUpperCase()) {
-            setInputLetters((old) => old.charAt(0).toUpperCase())
-        }
-    }, [ inputLetters, chosenCity?.label ])
-
     // when 3+ letters of a city have been typed in inputbox, make an api call to autocomplete a list of cities
     useEffect(() => {
         if (lettersReadyForCityApiCall.length > 2) {
             const apiUrl: string = encodeURI(`${thisDomain}/cities-list?letters=${lettersReadyForCityApiCall}`);
-console.log(apiUrl)
 
             axios.get(apiUrl)
                 .then((response: AxiosResponse ) => {
                     const cityDetails: ICityDetails[] = response.data
-                    console.log(cityDetails)
                     
                     return cityDetails.map((cityOption: any) => {
-                        console.log(`    `, cityOption)
                         return {
-                            label: `Cardiff`,
-                            lat: 51.3,
-                            lon: 1.3,
-                            flag: `https://countryflagsapi.com/png/uk`,
-                            regionCode: `WAL`
+                            label: cityOption.name,
+                            lat: cityOption.latitude,
+                            lon: cityOption.longitude,
+                            flag: `https://countryflagsapi.com/png/${cityOption.countryCode}`,
+                            regionCode: cityOption.regionCode
                         }
                     })
                 })
