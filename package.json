@@ -5,7 +5,9 @@
   "main": "y",
   "scripts": {
     "start": "PROD=true tsc ./server.ts --esModuleInterop && node server.js",
-    "dev": "nodemon ./server.ts",
+    "dev---": "cd ./fe && npm start && cd ../ && node ./server.js",
+    "dev": "cd ./fe && npm run build && cd ../ && tsc ./server.ts --esModuleInterop && node server.js",
+    "dev-old-old": "nodemon ./server.ts",
     "test": "test",
     "heroku-postbuild": "cd ./fe && npm i && npm run build && tsc",
     "build": "tsc server.ts --esModuleInterop"

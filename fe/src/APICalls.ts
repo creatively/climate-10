@@ -8,7 +8,9 @@ import { url } from 'inspector'
 
 
 export default function APICalls(
-        address: string, 
+        address: string,
+        lat: string,
+        lon: string, 
         yearsAgoStart: number,
         oldYearAgoStart: number,
         numberOfPastYears: number,  
@@ -28,7 +30,7 @@ export default function APICalls(
         const year: number = currentYear - index - 1
         const startYYYYMMDD: string = `${year}-01-01`
         const endYYYYMMDD: string = `${year}-12-31`
-        const apiUrl: string = encodeURI(`${process.env.REACT_APP_BACKEND_DOMAIN}/history?year=${year}&address=${address}&startDate=${startYYYYMMDD}&endDate=${endYYYYMMDD}`)
+        const apiUrl: string = encodeURI(`${window.location.origin}/history?lat=${lat}&lon=${lon}&year=${year}&startDate=${startYYYYMMDD}&endDate=${endYYYYMMDD}`)
         apiUrls.push(apiUrl)
     }
 
@@ -37,7 +39,7 @@ export default function APICalls(
         const year: number = currentYear - index - 1
         const startYYYYMMDD: string = `${year}-01-01`
         const endYYYYMMDD: string = `${year}-12-31`
-        const apiUrl = encodeURI(`${process.env.REACT_APP_BACKEND_DOMAIN}/history?year=${year}&address=${address}&startDate=${startYYYYMMDD}&endDate=${endYYYYMMDD}`)
+        const apiUrl: string = encodeURI(`${window.location.origin}/history?lat=${lat}&lon=${lon}&year=${year}&startDate=${startYYYYMMDD}&endDate=${endYYYYMMDD}`)
         apiOldUrls.push(apiUrl)
     }
 
@@ -46,26 +48,27 @@ export default function APICalls(
     function callAPI() {     
 
         function sendUrls(urls: string[], callbackAddYear: any) {
-            try {
-                Promise.all(
-                    urls.map((url: any) => {
-                        return axios.get(url)
+            urls.forEach((url: string) =>  {
+
+                axios.get(url)
+                    .then((response: any) => {
+                        const data: any = response.data
+                        const year: number = Number(data[0].datetime.substring(0, 4))
+                            setTimeout(() => {
+                                callbackAddYear(
+                                    year,
+                                    getTemperaturesFromData(data)
+                                )
+                            }, 1 * (1000 + Math.random()*3000))
                     })
-                ).then((datas) => {
-                    datas.forEach((data, index) => {
-                        setTimeout(() => {
-                            callbackAddYear(
-                                Number(getYearFromData(data.data)),
-                                getTemperaturesFromData(data.data)
-                            )
-                        }, index * (1000 + Math.random()*1000))
+                    .catch((error: any) => {
+                        console.log(error)
+                        callbackAddYear(
+                            99,
+                            []
+                        )
                     })
-                    
-                }).catch(handleError)
-            } catch(e: any) {
-                console.log(e)
-                throw new Error('there was an error trying to process the climate data')
-            }
+            })
         }
 
         sendUrls(apiUrls, addYear)
@@ -75,14 +78,19 @@ export default function APICalls(
     }
 
     // when passing a year's data is passed into this function, return what year the data represents
-    function getYearFromData(data: any) {
-        const year = Number(data.days[0].datetime.substring(0,4))
+    function getYearFromData(day: any) {
+console.log(day.datetime)
+        const datetime: number = Number(day.datetime)
+        const date: Date = new Date(datetime)
+        const year: string = date.getFullYear().toString()
         return year
     }
 
     // when a year's data is passed into this function, return jusr an array of numbers of temprature values
-    function getTemperaturesFromData(data: any) {
-        const temperatues = data.days.map((day: any) => day[weatherParameter])
+    function getTemperaturesFromData(days: any) {
+        console.log('--- days :', days)
+        const temperatues = days.map((day: any) => day[weatherParameter])
+        console.log('--- temperatures :', temperatues)
         return temperatues
     }
 
@@ -96,7 +104,7 @@ export default function APICalls(
         let userMessage: string = ``
 
         if (responseCode === 422) {
-            userMessage = `the past weather data for ${address} isn't available, please try another location`
+            userMessage = `the past weather data for your chosen location isn't available, please try another location`
         } else if (errorMessage === 'Network Error') {
             userMessage = `sorry, there was a network error trying to get you the information`
         } else if (errorMessage.length > 0) {
