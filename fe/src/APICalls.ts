@@ -79,7 +79,6 @@ export default function APICalls(
 
     // when passing a year's data is passed into this function, return what year the data represents
     function getYearFromData(day: any) {
-console.log(day.datetime)
         const datetime: number = Number(day.datetime)
         const date: Date = new Date(datetime)
         const year: string = date.getFullYear().toString()
@@ -88,9 +87,7 @@ console.log(day.datetime)
 
     // when a year's data is passed into this function, return jusr an array of numbers of temprature values
     function getTemperaturesFromData(days: any) {
-        console.log('--- days :', days)
         const temperatues = days.map((day: any) => day[weatherParameter])
-        console.log('--- temperatures :', temperatues)
         return temperatues
     }
 
