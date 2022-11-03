@@ -59,7 +59,7 @@ app.get('/history', (req: Request, res: Response) => {
     const lon: any = req.query.lon
     const startDate: any = req.query.startDate
     const endDate: any = req.query.endDate
-    const apiUrl: string = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${lat},${lon}/${startDate}/${endDate}?unitGroup=uk&elements=name%2Caddress%2CresolvedAddress%2Ctempmax%2Cdatetime&include=days%2Cobs&key=ZG6RTP56DLKZJ8LWJCLVK4RM7&options=preview&contentType=json`
+    const apiUrl: string = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${lat},${lon}/${startDate}/${endDate}?unitGroup=uk&elements=name%2Caddress%2CresolvedAddress%2Ctempmax%2Cdatetime&include=days%2Cobs&key=${process.env.KEY_API_VISUALCROSSING}&options=preview&contentType=json`
 
     axios(apiUrl)
         .then((response: AxiosResponse) => {
