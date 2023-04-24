@@ -79,7 +79,7 @@ export default function SearchBoxCustom({ onSearchBoxUpdate }: ISearchBoxProps) 
                             label: cityOption.name,
                             lat: cityOption.latitude,
                             lon: cityOption.longitude,
-                            flag: `https://countryflagsapi.com/png/${cityOption.countryCode}`,
+                            flag: `https://flagsapi.com/${cityOption.countryCode}/flat/64.png`,
                             regionCode: cityOption.regionCode
                         }
                     })
