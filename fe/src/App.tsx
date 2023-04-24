@@ -311,8 +311,8 @@ export default function App() {
         <>
 
           <section className="key">
-            <div className="key__old-years">2007 to 2011</div>
-            <div className="key__new-years">2017 to 2021</div>
+            <div className="key__old-years">2008 to 2012</div>
+            <div className="key__new-years">2018 to 2022</div>
           </section>
 
           <section className="charts-container">
